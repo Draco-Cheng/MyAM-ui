@@ -41,6 +41,7 @@
     "url-loader": "^1.0.1",
     "webpack": "^4.9.1",
     "webpack-dev-server": "^3.1.4",
+    "webpack-cli": "^2.1.4",
     "zone.js": "^0.8.4"
   },
   "devDependencies": {
@@ -59,8 +60,7 @@
     "raw-loader": "^0.5.1",
     "ts-loader": "^4.3.0",
     "typescript": "~2.8.3",
-    "uglifyjs-webpack-plugin": "^1.2.5",
-    "webpack-cli": "^2.1.4"
+    "uglifyjs-webpack-plugin": "^1.2.5"
   },
   "repository": {}
 }
