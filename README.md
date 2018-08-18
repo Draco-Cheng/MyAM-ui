@@ -1,6 +1,6 @@
 # MyAM-UI
 
-This is a page is made for MyAM server.
+This web app is made for MyAM server.
 
 ## about the server
 Default administrator account: __admin__ / __admin__
