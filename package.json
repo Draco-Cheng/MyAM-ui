@@ -5,11 +5,13 @@
   "description": "MyAM Frontend Page",
   "scripts": {
     "build": "webpack",
-    "start": "set dev=true && webpack-dev-server --hot --inline"
+    "start": "set dev=true && webpack-dev-server --hot --inline",
+    "install": "webpack"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "main": "index.js",
   "dependencies": {
     "@angular/animations": "~6.0.3",
     "@angular/common": "~6.0.3",
