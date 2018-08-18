@@ -1,11 +1,6 @@
-# MyAM
+# MyAM-UI
 
-This is a server for record personal spending history.
-
-## How to use
- Open command line ```npm install``` then ```npm start```, then visit ```http://localhost:8000/```
- 
- #### server use async/await, it needs nodejs 7+
+This is a page is made for MyAM server.
 
 ## about the server
 Default administrator account: __admin__ / __admin__
