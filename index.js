@@ -1,3 +1,3 @@
 exports.getUiDirectory = function () {
-    return __dirname + '/src';
+    return __dirname + '/dist';
 }

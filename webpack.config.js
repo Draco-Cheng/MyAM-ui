@@ -1,17 +1,17 @@
 const isDev = !!process.env.dev;
-const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 let setting = {
-  entry: './src/index.ts',
-  devtool: 'source-map',
+  entry: path.join(__dirname, 'src/index.ts'),
   output: {
-    path: __dirname + '/src/dist',
-    filename: 'bundle.js',
+    path: path.join(__dirname, '/dist'),
+    filename: 'bundle-[hash].js',
   },
   devServer: {
-    publicPath: '/dist',
-    contentBase: './src'
+    contentBase: path.join(__dirname, '/dist'),
+    port: 8080
   },
   resolve: {
     extensions: ['.js', '.ts']
@@ -27,7 +27,12 @@ let setting = {
       exclude: /\.\/node_modules/
     }]
   },
-  plugins: []
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'src/index.html'
+    })
+  ]
 };
 
 if (isDev) {
@@ -35,7 +40,6 @@ if (isDev) {
     test: /\.(png|woff|woff2|eot|ttf|svg)$/,
     use: 'url-loader?limit=100000'
   }, {
-
     test: /\.(css|less)$/,
     use: [{
       loader: 'style-loader' // creates style nodes from JS strings
@@ -45,13 +49,13 @@ if (isDev) {
       loader: 'less-loader' // compiles Less to CSS
     }]
   }];
+  setting['devServer']['inline'] = true;
+  setting['devtool'] = 'source-map';
   setting['module']['rules'].push(..._addLoaders);
 } else {
   // compile less
-  const ExtractTextPlugin = require('extract-text-webpack-plugin');
   const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
-  const extractLESS = new MiniCssExtractPlugin({filename:'[name].css'});
+  const extractLESS = new MiniCssExtractPlugin({ filename: '[name]-[hash].css' });
 
   let _addLoaders = [{
     test: /\.(jpe?g|gif|png|svg|woff|woff2|eot|ttf|wav|mp3)$/,
@@ -77,7 +81,6 @@ if (isDev) {
 
 
   // minify js setting
-  setting['devtool'] = 'source-map';
   setting['plugins'].push(
     new UglifyJsPlugin({
       uglifyOptions: {
@@ -86,14 +89,15 @@ if (isDev) {
         cache: true,
         parallel: true,
         compress: {
-          passes : 1
+          passes: 3,
+          inline: 3
         },
         output: {
           comments: false,
           beautify: true // comment out or set to false for production
         }
       },
-      sourceMap: true
+      sourceMap: false
     })
   );
 }
