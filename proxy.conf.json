@@ -1,0 +1,8 @@
+{
+  "_comment": "This config is made for ng serve --proxy-config. More detail goes: https://github.com/angular/angular-cli/blob/master/docs/documentation/stories/proxy.md",
+  "/": {
+    "target": "http://localhost:8000",
+    "secure": false
+  }
+}
+
