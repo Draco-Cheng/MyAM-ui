@@ -21,7 +21,7 @@ export class AddDbPopOutDirectiveComponent {
   private dbName;
   private currencyType;
   private uploadFile;
-  private showUploadBlock;
+  public showUploadBlock;
 
   constructor(
     private profileService: ProfileService,

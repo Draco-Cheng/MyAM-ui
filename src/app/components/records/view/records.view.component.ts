@@ -51,7 +51,7 @@ window.onscroll = onScroll;
 })
 
 export class RecordsViewComponent {
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   @ViewChild('showMoreBtn') showMoreBtn: ElementRef;

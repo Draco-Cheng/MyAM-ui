@@ -19,7 +19,7 @@ import { CurrencyService } from '../../../service/currency.service';
 export class RecordTableDirectiveComponent {
   @Input() records: any;
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private types;

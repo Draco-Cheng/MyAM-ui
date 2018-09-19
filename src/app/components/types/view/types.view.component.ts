@@ -12,7 +12,7 @@ import { TypeService } from '../../../service/type.service';
 })
 
 export class TypesViewComponent {
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private types;

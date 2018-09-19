@@ -33,10 +33,10 @@ function cloneObj(obj) {
 })
 
 export class RecordsAddComponent {
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
-  private records;
+  public records;
   private types;
   private typesFlat = {};
   private typesMapFlat = null;

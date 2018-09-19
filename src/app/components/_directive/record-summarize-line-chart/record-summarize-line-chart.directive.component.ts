@@ -18,7 +18,7 @@ import { NgxLineChartConf } from './ngx-line-chart-conf';
 export class RecordSummarizeLineChartDirectiveComponent {
   @Input() getDaySummerize: Function;
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private lineChartSelected = '';

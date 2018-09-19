@@ -21,11 +21,11 @@ export class TypeQuickListDirectiveComponent {
   @Input() inputCid ? : String;
   //*************************************
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private types;
-  private typeQuickList;
+  public typeQuickList;
 
   constructor(
     private typeService: TypeService,

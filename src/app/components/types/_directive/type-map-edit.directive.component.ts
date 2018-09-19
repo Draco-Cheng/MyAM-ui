@@ -19,10 +19,10 @@ export class TypeMapEditDirectiveComponent {
   //*************************************
   // internal input
   @Input() parentNodes ? : string;
-  @Input() currentNode ? : number;
+  @Input() currentNode ? : number | string;
   //*************************************
 
-  private childNode;
+  public childNode;
   private showParentSelectPopOut;
   private disabledTids = {};
   private _typesMapFlatMeta;

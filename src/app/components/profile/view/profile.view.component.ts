@@ -16,7 +16,7 @@ function cloneObj(obj) {
 })
 
 export class ProfileViewComponent {
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private user;

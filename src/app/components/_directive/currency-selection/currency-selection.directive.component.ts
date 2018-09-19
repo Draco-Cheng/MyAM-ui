@@ -27,14 +27,14 @@ export class CurrencySelectionDirectiveComponent {
 
   @ViewChild('currencySelectInput') currencySelectInput: ElementRef;
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private cid;
   private currencyStructureMap;
   private currencyFlatMap;
   private quickSelectList;
-  private showCurrencyMap;
+  public showCurrencyMap;
 
   constructor(
     private currencyService: CurrencyService,

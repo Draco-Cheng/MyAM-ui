@@ -18,13 +18,13 @@ import { CurrencyService } from '../../../service/currency.service';
 export class RecordSummarizeTypeFlatDirectiveComponent {
   @Input() getTypeSummerize: Function;
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private types;
   private typesFlat = {};
   private typesMapFlatMeta;
-  private typeSummerize;
+  public typeSummerize;
   private currencyTotalSummerize;
 
   private currencyFlatMap;

@@ -35,10 +35,10 @@ import { NotificationHandler } from '../../handler/notification.handler';
   ]
 })
 export class NotificationBubbleComponent {
-  private __isInit;
+  public __isInit;
   private __meta = {};
 
-  private msgPool = [];
+  public msgPool = [];
 
   private notificationId;
 

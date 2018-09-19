@@ -18,7 +18,7 @@ import { NgxPieChartConf } from './ngx-pie-chart-conf';
 export class RecordSummarizeTypePieChartDirectiveComponent {
   @Input() getTypeSummerize: Function;
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
   private typesMapFlat;
   

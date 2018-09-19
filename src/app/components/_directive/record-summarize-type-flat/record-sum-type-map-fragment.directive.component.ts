@@ -21,10 +21,10 @@ export class RecordSumTypeMapFragmentDirectiveComponent {
   //*************************************
   // internal input
   @Input() parentNodes ? : string;
-  @Input() currentNode ? : number;
+  @Input() currentNode ? : number | string;
   //*************************************
 
-  private childNode;
+  public childNode;
   private _typesMapFlatMeta;
 
   constructor() {};

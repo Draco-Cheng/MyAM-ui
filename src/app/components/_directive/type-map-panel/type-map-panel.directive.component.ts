@@ -22,7 +22,7 @@ export class TypeMapPanelDirectiveComponent {
   // optional input
   //*************************************
 
-  private __isInit = false;
+  public __isInit = false;
   private __meta = {};
 
   private types;
