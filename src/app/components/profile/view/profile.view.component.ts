@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
 
-
 import { ProfileService } from '../../../service/profile.service';
-
-import './profile.view.style.less';
 
 function cloneObj(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -11,7 +8,8 @@ function cloneObj(obj) {
 
 @Component({
   selector: 'profile-content',
-  template: require('./profile.view.template.html'),
+  templateUrl: './profile.view.template.html',
+  styleUrls: ['./profile.view.style.less'],
   providers: [
     ProfileService
   ]

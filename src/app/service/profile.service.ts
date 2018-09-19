@@ -6,7 +6,7 @@ import { CacheHandler } from '../handler/cache.handler';
 import { CryptHandler } from '../handler/crypt.handler';
 import { NotificationHandler } from '../handler/notification.handler';
 
-const profileMap = require('./profile.map.json');
+import profileMap from './profile.map.json';
 
 @Injectable() export class ProfileService {
   private endpoint_db = '/db';

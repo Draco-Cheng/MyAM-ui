@@ -4,11 +4,10 @@ import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 
-import './record-summarize-type-flat.style.less';
-
 @Component({
   selector: '[record-summarize-type-flat]',
-  template: require('./record-summarize-type-flat.template.html'),
+  templateUrl: './record-summarize-type-flat.template.html',
+  styleUrls: ['./record-summarize-type-flat.style.less'],
   providers: [
     RecordsService,
     TypeService,

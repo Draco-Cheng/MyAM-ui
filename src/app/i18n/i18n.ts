@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 
+import i18_en from './en-us.json';
+
 var i18nPool = {};
 var language = 'en-us';
-i18nPool['en-us'] = require('./en-us.json');
+
+i18nPool['en-us'] = i18_en;
 
 export function i18n(type, query) {
   try {

@@ -4,11 +4,10 @@ import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 
-import './record-table.style.less';
-
 @Component({
   selector: 'records-table',
-  template: require('./record-table.template.html'),
+  templateUrl: './record-table.template.html',
+  styleUrls: ['../records.style.less', './record-table.style.less'],
   providers: [
     RecordsService,
     TypeService,

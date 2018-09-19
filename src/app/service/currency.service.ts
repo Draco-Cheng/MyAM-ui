@@ -5,7 +5,7 @@ import { CacheHandler } from '../handler/cache.handler';
 import { ConfigHandler } from '../handler/config.handler';
 import { NotificationHandler } from '../handler/notification.handler';
 
-const currencyList = require('./currency.list.json');
+import currencyList from './currency.list.json';
 
 let currencyExchangeCache = {};
 let currencyMapForExchangeCache = null;

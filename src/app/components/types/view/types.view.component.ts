@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
-import './types.view.style.less';
-
 @Component({
   selector: 'currency-content',
-  template: require('./types.view.template.html'),
+  templateUrl: './types.view.template.html',
+  styleUrls: ['./types.view.style.less'],
   providers: [
     TypeService
   ]

@@ -2,11 +2,10 @@ import { Component, Input, ElementRef, ViewChild } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
-import './type-map-panel.style.less';
-
 @Component({
   selector: '[type-map-panel]',
-  template: require('./type-map-panel.template.html'),
+  templateUrl: './type-map-panel.template.html',
+  styleUrls: ['./type-map-panel.style.less'],
   providers: [TypeService],
 
 })

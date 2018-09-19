@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 
 import { CurrencyService } from '../../../service/currency.service';
 
-import './currency.view.style.less';
-
 function formatDate(date) {
   var d = new Date(date),
     month = '' + (d.getMonth() + 1),
@@ -19,7 +17,8 @@ function formatDate(date) {
 
 @Component({
   selector: 'currency-content',
-  template: require('./currency.view.template.html'),
+  templateUrl: './currency.view.template.html',
+  styleUrls: ['./currency.view.style.less'],
   providers: [
     CurrencyService
   ]

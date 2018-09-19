@@ -5,12 +5,10 @@ import { SummarizeService } from '../../../service/summarize.service';
 
 import { NgxPieChartConf } from './ngx-pie-chart-conf';
 
-
-import './record-summarize-type-pie-chart.style.less';
-
 @Component({
   selector: '[record-summarize-type-pie-chart]',
-  template: require('./record-summarize-type-pie-chart.template.html'),
+  templateUrl: './record-summarize-type-pie-chart.template.html',
+  styleUrls: ['./record-summarize-type-pie-chart.style.less'],
   providers: [
     TypeService,
     SummarizeService

@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 
-import './dashboard.style.less';
-
 @Component({
   selector: 'content-mid-center',
-  template: require('./dashboard.template.html')
+  templateUrl: './dashboard.template.html',
+  styleUrls: ['./dashboard.style.less']
 })
 export class DashboardComponent {}

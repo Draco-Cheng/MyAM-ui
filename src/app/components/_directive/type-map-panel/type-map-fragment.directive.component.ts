@@ -1,10 +1,9 @@
 import { Component, Input } from '@angular/core';
 
-import './type-map-fragment.style.less';
-
 @Component({
   selector: '[type-map-fragment]',
-  template: require('./type-map-fragment.template.html'),
+  templateUrl: './type-map-fragment.template.html',
+  styleUrls: ['./type-map-fragment.style.less'],
   providers: []
 })
 

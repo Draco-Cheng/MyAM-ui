@@ -3,11 +3,10 @@ import { Component, Input } from '@angular/core';
 
 import { CurrencyService } from '../../../service/currency.service';
 
-import './currency-edit-map.style.less';
-
 @Component({
   selector: '[currency-edit-map]',
-  template: require('./currency-edit-map.template.html'),
+  templateUrl: './currency-edit-map.template.html',
+  styleUrls: ['./currency-edit-map.style.less'],
   providers: []
 })
 

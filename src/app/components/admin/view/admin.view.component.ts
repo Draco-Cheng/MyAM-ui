@@ -4,15 +4,14 @@ import { Component } from '@angular/core';
 import { AdminServer } from '../../../service/admin.service';
 import { ProfileService } from '../../../service/profile.service';
 
-import './admin.view.style.less';
-
 function cloneObj(obj) {
   return JSON.parse(JSON.stringify(obj));
 };
 
 @Component({
   selector: 'admin-content',
-  template: require('./admin.view.template.html'),
+  templateUrl: './admin.view.template.html',
+  styleUrls: ['./admin.view.style.less'],
   providers: [
     ProfileService,
     AdminServer

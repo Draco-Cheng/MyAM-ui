@@ -20,10 +20,6 @@ import { RecordSummarizeTypeFlatDirectiveModule } from '../_directive/record-sum
 import { RecordSummarizeTypePieChartDirectiveModule } from '../_directive/record-summarize-type-pie-chart/module';
 import { RecordSummarizeLineChartDirectiveModule } from '../_directive/record-summarize-line-chart/module';
 
-
-// style
-import './records.style.less';
-
 @NgModule({
   imports: [
     CommonModule,

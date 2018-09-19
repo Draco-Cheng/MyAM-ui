@@ -1,10 +1,9 @@
 import { Component, Input } from '@angular/core';
 
-import './record-sum-type-map-fragment.style.less';
-
 @Component({
   selector: '[record-sum-type-map-fragment]',
-  template: require('./record-sum-type-map-fragment.template.html'),
+  templateUrl: './record-sum-type-map-fragment.template.html',
+  styleUrls: ['./record-sum-type-map-fragment.style.less'],
   providers: []
 })
 

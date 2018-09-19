@@ -5,12 +5,10 @@ import { SummarizeService } from '../../../service/summarize.service';
 
 import { NgxLineChartConf } from './ngx-line-chart-conf';
 
-
-import './record-summarize-line-chart.style.less';
-
 @Component({
   selector: '[record-summarize-line-chart]',
-  template: require('./record-summarize-line-chart.template.html'),
+  templateUrl: './record-summarize-line-chart.template.html',
+  styleUrls: ['./record-summarize-line-chart.style.less'],
   providers: [
     RecordsService,
     SummarizeService

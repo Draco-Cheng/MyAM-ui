@@ -4,11 +4,10 @@ import { Router } from '@angular/router';
 
 import { AuthService } from '../../../service/auth.service';
 
-require('./register.style.less')
-
 @Component({
   selector: 'content-mid-center',
-  template: require('./register.template.html'),
+  templateUrl: './register.template.html',
+  styleUrls: ['./register.style.less'],
   providers: [AuthService]
 })
 export class RegisterComponent {
@@ -18,7 +17,7 @@ export class RegisterComponent {
     private router: Router
   ) {}
 
-  private form = {
+  public form = {
     name: '',
     account: '',
     pwd: '',

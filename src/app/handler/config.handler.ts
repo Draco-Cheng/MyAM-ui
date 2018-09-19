@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 
-var config = require('../config.json');
+import defaultConf from '../config.json';
+
+var config = defaultConf;
 
 function cloneObj(obj) {
   return JSON.parse(JSON.stringify(obj));

@@ -1,12 +1,11 @@
 import { Component, Input } from '@angular/core';
 
-import './type-quick-list.style.less';
-
 import { TypeService } from '../../../service/type.service';
 
 @Component({
   selector: 'type-quick-list',
-  template: require('./type-quick-list.template.html'),
+  templateUrl: './type-quick-list.template.html',
+  styleUrls: ['./type-quick-list.style.less'],
   providers: [TypeService]
 })
 

@@ -10,11 +10,10 @@ import {
 
 import { NotificationHandler } from '../../handler/notification.handler';
 
-import './notification-bubble.style.less';
-
 @Component({
   selector: 'notification-bubble',
-  template: require('./notification-bubble.template.html'),
+  templateUrl: './notification-bubble.template.html',
+  styleUrls: ['./notification-bubble.style.less'],
   providers: [
     NotificationHandler
   ],

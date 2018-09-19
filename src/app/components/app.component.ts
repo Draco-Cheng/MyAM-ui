@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 
-import './app.style.less';
-
 @Component({
   selector: 'my-app',
-  template: require('./app.template.html')
+  templateUrl: './app.template.html',
+  styleUrls: ['./app.style.less']
 })
 
 export class AppComponent {}

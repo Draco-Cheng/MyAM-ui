@@ -1,10 +1,9 @@
 import { Component, Input, ElementRef, ViewChild } from '@angular/core';
 
-import './type-map-panel-pop-out.style.less';
-
 @Component({
   selector: '[type-map-panel-pop-out]',
-  template: require('./type-map-panel-pop-out.template.html'),
+  templateUrl: './type-map-panel-pop-out.template.html',
+  styleUrls:['./type-map-panel-pop-out.style.less'],
   providers: []
 })
 

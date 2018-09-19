@@ -7,7 +7,7 @@ import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'content-mid-center',
-  template: require('./login.template.html'),
+  templateUrl: './login.template.html',
   providers: [AuthService]
 })
 export class LoginComponent {
@@ -17,7 +17,7 @@ export class LoginComponent {
     private router: Router
   ) {}
 
-  private form = new LoginForm('', '', false);
+  public form = new LoginForm('', '', false);
 
   async onSubmit() {
     await this.authService.login(this.form);

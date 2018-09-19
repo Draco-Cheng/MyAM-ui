@@ -1,11 +1,9 @@
 import { Component, Input } from '@angular/core';
 
-
-import './currency-map.style.less';
-
 @Component({
   selector: '[currency-map]',
-  template: require('./currency-map.template.html'),
+  templateUrl: './currency-map.template.html',
+  styleUrls: ['./currency-map.style.less'],
   providers: []
 })
 

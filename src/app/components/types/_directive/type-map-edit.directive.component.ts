@@ -2,11 +2,10 @@ import { Component, Input } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
-import './type-map-edit.style.less';
-
 @Component({
   selector: '[type-map-edit]',
-  template: require('./type-map-edit.template.html'),
+  templateUrl: './type-map-edit.template.html',
+  styleUrls: ['./type-map-edit.style.less'],
   providers: [TypeService]
 })
 

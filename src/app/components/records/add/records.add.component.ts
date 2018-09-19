@@ -5,8 +5,6 @@ import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 
-import './records.add.style.less';
-
 function formatDate(date) {
   var d = new Date(date),
     month = '' + (d.getMonth() + 1),
@@ -25,7 +23,8 @@ function cloneObj(obj) {
 
 @Component({
   selector: 'records-content',
-  template: require('./records.add.template.html'),
+  templateUrl: './records.add.template.html',
+  styleUrls: ['../records.style.less', './records.add.style.less'],
   providers: [
     RecordsService,
     TypeService,

@@ -5,8 +5,6 @@ import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 import { SummarizeService } from '../../../service/summarize.service';
 
-import './records.view.style.less';
-
 function formatDate(date) {
   var d = new Date(date),
     month = '' + (d.getMonth() + 1),
@@ -36,7 +34,8 @@ window.onscroll = onScroll;
 
 @Component({
   selector: 'records-content',
-  template: require('./records.view.template.html'),
+  templateUrl: './records.view.template.html',
+  styleUrls: ['../records.style.less', './records.view.style.less'],
   providers: [
     RecordsService,
     TypeService,

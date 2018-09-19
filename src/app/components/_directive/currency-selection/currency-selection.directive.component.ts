@@ -4,11 +4,10 @@ import { CurrencyMapDirectiveComponent } from './currency-map.directive.componen
 
 import { CurrencyService } from '../../../service/currency.service';
 
-import './currency-selection.style.less';
-
 @Component({
   selector: '[currency-selection]',
-  template: require('./currency-selection.template.html'),
+  templateUrl: './currency-selection.template.html',
+  styleUrls: ['./currency-selection.style.less'],
   providers: [CurrencyService],
 
 })

@@ -3,11 +3,10 @@ import { Component } from '@angular/core';
 import { ProfileService } from '../../service/profile.service';
 import { AuthService } from '../../service/auth.service';
 
-import './nav.style.less';
-
 @Component({
   selector: 'navView',
-  template: require('./nav.template.html'),
+  templateUrl: './nav.template.html',
+  styleUrls: ['./nav.style.less'],
   providers: [
     ProfileService,
     AuthService
@@ -15,8 +14,8 @@ import './nav.style.less';
 })
 export class NavComponent {
   private name = 'MyAM';
-  private __isInit;
   private __meta = {};
+  public __isInit;
 
   private user;
   private isLogin;
