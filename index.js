@@ -1,3 +1,3 @@
 exports.getUiDirectory = function () {
-    return __dirname + '/dist';
+    return __dirname + '/dist/myam-ui';
 }
