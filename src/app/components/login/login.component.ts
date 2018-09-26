@@ -8,6 +8,7 @@ import { AuthService } from '../../service/auth.service';
 @Component({
   selector: 'content-mid-center',
   templateUrl: './login.template.html',
+  styleUrls: ['./login.style.less'],
   providers: [AuthService]
 })
 export class LoginComponent {
@@ -15,7 +16,7 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   public form = new LoginForm('', '', false);
 
