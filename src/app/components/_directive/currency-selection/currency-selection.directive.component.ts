@@ -35,6 +35,7 @@ export class CurrencySelectionDirectiveComponent {
   private currencyFlatMap;
   private quickSelectList;
   public showCurrencyMap;
+  public selectedCurrencyInfo;
 
   constructor(
     private currencyService: CurrencyService,
@@ -44,6 +45,7 @@ export class CurrencySelectionDirectiveComponent {
   async ngOnInit() {
     await this.getCurrency();
     this.cid = this.inputCid || '';
+    this.setSelectedCurrencyInfo();
     this.__isInit = true;
   };
 
@@ -71,6 +73,12 @@ export class CurrencySelectionDirectiveComponent {
       this.showCurrencyMap = true;
     else
       this.callback(cid || null);
+
+      this.setSelectedCurrencyInfo();
+  }
+
+  setSelectedCurrencyInfo() {
+    this.selectedCurrencyInfo = this.currencyFlatMap[this.cid] || {};
   }
 
   currencyMapCallcak = (function(_self) {

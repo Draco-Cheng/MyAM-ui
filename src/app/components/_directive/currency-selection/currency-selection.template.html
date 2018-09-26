@@ -1,21 +1,26 @@
-<select #currencySelectInput *ngIf="__isInit && __checkDataUpToDate()" class="currency-selection" [(ngModel)]="cid" (change)="onSelect(cid)">
-  <option *ngIf="!inputCid || enableAnyOption" value=''>---</option>
-  <optgroup *ngIf="inputCid && inputCid != -1" label="Current Selection">
-    <option [value]="inputCid">
-      {{currencyFlatMap[inputCid].type}} {{currencyFlatMap[inputCid].date}} {{currencyFlatMap[inputCid].memo}}
-    </option>
-  </optgroup>
-  <optgroup label="Quick Select List">
-    <option *ngFor="let currency of quickSelectList" [value]="currency.cid">
-      {{currency.type}} {{currency.date}} {{currency.memo}}
-    </option>
-  </optgroup>
-  <optgroup label="More">
-    <option value="-1">
-      Show Currency Map
-    </option>
-  </optgroup>
-</select>
+<div class="currency-selection">
+    <div class="currency-selection-lable">
+        {{selectedCurrencyInfo.type ||'---'}}
+    </div>
+    <select #currencySelectInput *ngIf="__isInit && __checkDataUpToDate()" class="currency-selection-select" title="{{selectedCurrencyInfo.date}} {{selectedCurrencyInfo.memo}}" [(ngModel)]="cid" (change)="onSelect(cid)">
+      <option *ngIf="!inputCid || enableAnyOption" value=''>---</option>
+      <optgroup *ngIf="inputCid && inputCid != -1" label="Current Selection">
+        <option [value]="inputCid">
+          {{currencyFlatMap[inputCid].type}} {{currencyFlatMap[inputCid].date}} {{currencyFlatMap[inputCid].memo}}
+        </option>
+      </optgroup>
+      <optgroup label="Quick Select List">
+        <option *ngFor="let currency of quickSelectList" [value]="currency.cid">
+          {{currency.type}} {{currency.date}} {{currency.memo}}
+        </option>
+      </optgroup>
+      <optgroup label="More">
+        <option value="-1">
+          Show Currency Map
+        </option>
+      </optgroup>
+    </select>
+</div>
 
 <div class="currency-sel-type-map-full-screen" *ngIf="showCurrencyMap">
   <div class="currency-sel-type-map-panel">

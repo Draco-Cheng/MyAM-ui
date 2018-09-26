@@ -1,7 +1,22 @@
 .currency-selection {
+  display: inline-block;
+  margin-right: 12px;
+}
+.currency-selection-lable {
+  text-align: center;
+  z-index: -1;
+  position: absolute;
+  border: 1px solid;
+  border-radius: 10px;
+}
+.currency-selection-select {
+  opacity: 0;
+}
+.currency-selection-lable, .currency-selection-select {
   width: 45px;
   font-family: monospace;
   font-weight: 800;
+  cursor: pointer;
 }
 
 .currency-sel-type-map-full-screen {
