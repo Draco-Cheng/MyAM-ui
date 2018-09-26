@@ -1,6 +1,6 @@
 <div class="currency-selection">
     <div class="currency-selection-lable">
-        {{selectedCurrencyInfo.type ||'---'}}
+        {{selectedCurrencyInfo.type}}
     </div>
     <select #currencySelectInput *ngIf="__isInit && __checkDataUpToDate()" class="currency-selection-select" title="{{selectedCurrencyInfo.date}} {{selectedCurrencyInfo.memo}}" [(ngModel)]="cid" (change)="onSelect(cid)">
       <option *ngIf="!inputCid || enableAnyOption" value=''>---</option>
