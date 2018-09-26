@@ -35,7 +35,7 @@ export class CurrencySelectionDirectiveComponent {
   private currencyFlatMap;
   private quickSelectList;
   public showCurrencyMap;
-  public selectedCurrencyInfo;
+  public selectedCurrencyInfo = {};
 
   constructor(
     private currencyService: CurrencyService,

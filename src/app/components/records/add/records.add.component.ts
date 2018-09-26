@@ -47,7 +47,7 @@ export class RecordsAddComponent {
     tids: {},
     memo: '',
     date: formatDate(Date.now()),
-    cid: this.currencyService.getDefaultCid()
+    cid: ''
   };
 
   constructor(
@@ -59,6 +59,7 @@ export class RecordsAddComponent {
   async ngOnInit() {
     await this.getRecord();
     await this.getTypes();
+    this.newRecord.cid = this.currencyService.getDefaultCid();
     this.__isInit = true;
   };
 
