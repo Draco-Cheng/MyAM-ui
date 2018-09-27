@@ -35,7 +35,8 @@ export class CurrencySelectionDirectiveComponent {
   private currencyFlatMap;
   private quickSelectList;
   public showCurrencyMap;
-  public selectedCurrencyInfo;
+  private defaultSelectedCurrencyInfo = { type: '---' };
+  public selectedCurrencyInfo = this.defaultSelectedCurrencyInfo;
 
   constructor(
     private currencyService: CurrencyService,
@@ -78,7 +79,7 @@ export class CurrencySelectionDirectiveComponent {
   }
 
   setSelectedCurrencyInfo() {
-    this.selectedCurrencyInfo = this.currencyFlatMap[this.cid] || { type: '---' };
+    this.selectedCurrencyInfo = this.currencyFlatMap[this.cid] || this.defaultSelectedCurrencyInfo;
   }
 
   currencyMapCallcak = (function (_self) {
