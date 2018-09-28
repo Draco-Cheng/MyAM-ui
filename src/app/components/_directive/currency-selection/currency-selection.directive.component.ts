@@ -82,13 +82,12 @@ export class CurrencySelectionDirectiveComponent {
     this.selectedCurrencyInfo = this.currencyFlatMap[this.cid] || this.defaultSelectedCurrencyInfo;
   }
 
-  currencyMapCallcak = (function (_self) {
-    return cid => {
-      _self.showCurrencyMap = false;
-      _self.cid = cid || _self.inputCid;
-      _self.callback(_self.cid || null);
-    };
-  })(this);
+  currencyMapCallcak = cid => {
+    this.showCurrencyMap = false;
+    this.cid = cid || this.inputCid;
+    this.callback(this.cid);
+    this.setSelectedCurrencyInfo();
+  };
 
   objKeys(obj) {
     return Object.keys(obj);
