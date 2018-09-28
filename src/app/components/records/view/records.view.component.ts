@@ -40,7 +40,7 @@ window.onscroll = onScroll;
     RecordsService,
     TypeService,
     CurrencyService,
-    SummarizeService    
+    SummarizeService
   ],
 
   /*
@@ -59,6 +59,7 @@ export class RecordsViewComponent {
   @ViewChild('recordSummarizeTypePieChart') recordSummarizeTypePieChart;
   @ViewChild('recordSummarizeLineChart') recordSummarizeLineChart;
 
+  private loading = false;
   private records;
   private records_pool = [];
   private records_push_number = 25;
@@ -88,7 +89,7 @@ export class RecordsViewComponent {
     private recordsService: RecordsService,
     private typeService: TypeService,
     private summarizeService: SummarizeService
-  ) {};
+  ) { };
 
   async ngOnInit() {
     await this.getRecord();
@@ -134,9 +135,11 @@ export class RecordsViewComponent {
     return _arr;
   }
 
-  async conditionChange() {
-    await this.buildQureyConditionTidsArr();
-    await this.getRecord();
+  conditionChange() {
+    this.loading = true;
+    this.buildQureyConditionTidsArr()
+      .then(() => this.getRecord())
+      .then(() => this.loading = false);
   }
 
   async buildQureyConditionTidsArr() {
@@ -154,7 +157,7 @@ export class RecordsViewComponent {
     this.qureyCondition['tids_json'] = _arr.length ? JSON.stringify(_arr) : null;
   }
 
-  typeMapCallback = async(tid, label) => {
+  typeMapCallback = async (tid, label) => {
     if (!tid) {
       this.showTypeMap = false;
       this.conditionChange();

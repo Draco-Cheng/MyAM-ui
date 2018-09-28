@@ -40,6 +40,7 @@ export class RecordsAddComponent {
   private types;
   private typesFlat = {};
   private typesMapFlat = null;
+  private loading = false;
 
   private newRecord = {
     cashType: -1,
@@ -54,7 +55,7 @@ export class RecordsAddComponent {
     private recordsService: RecordsService,
     private typeService: TypeService,
     private currencyService: CurrencyService
-  ) {};
+  ) { };
 
   async ngOnInit() {
     await this.getRecord();
@@ -103,6 +104,12 @@ export class RecordsAddComponent {
       this.newRecord.memo = '';
     }
   };
+
+  submitNewRecord() {
+    this.loading = true;
+    this.addRecord()
+      .then(() => this.loading = false);
+  }
 
   async currencyExchange(records) {
     // for(let record of records){

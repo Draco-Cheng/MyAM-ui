@@ -1,6 +1,6 @@
 <div *ngIf="__isInit" (scroll)="onScroll($event)" class="col-md-12">
   <h1>Records</h1>
-  <div class="records-query-panel" (change)="conditionChange()">
+  <div class="records-query-panel">
     <h3>Query Condition</h3>
     <div class="records-query-block">
       <div class="records-query-block-col col-md-4">
@@ -64,6 +64,10 @@
           </div>
         </div>
         <div *ngIf="showTypeMap" type-map-panel-pop-out [callback]="typeMapCallback" [selectedTids]="qureyConditionTidsObj"></div>
+      </div>
+      <div class="records-query-block-col col-md-12">
+        <span *ngIf="!loading" class="btn btn-primary records-view-submit-btn" (click)="conditionChange()">Submit</span>
+        <span *ngIf="loading" class="btn btn-primary records-view-submit-btn"><span class="glyphicon glyphicon-refresh"></span></span>
       </div>
     </div>
   </div>
