@@ -14,7 +14,7 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
   // -------------------------------------
   // neceesary input
   @Input() typesFlat: any;
-  @Input() typesMapFlatMetaInput: any;
+  @Input() typesMapFlatMeta: any;
   @Input() callback: Function;
   @Input() selectedTids: Object;
   @Input() disabledTids?: Object;
@@ -25,20 +25,17 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
   // *************************************
 
   public childNode;
-  private typesMapFlatMeta;
 
   constructor() { }
 
   ngOnInit() {
     this.parentNodes = this.parentNodes || '';
     this.currentNode && (this.parentNodes += this.currentNode + ',');
-    this.typesMapFlatMeta = this.typesMapFlatMetaInput;
     this.getChildNode();
   }
 
   __checkDataUpToDate() {
     if (this.typesMapFlatMeta['legacy']) {
-      this.typesMapFlatMeta = this.typesMapFlatMetaInput;
       this.getChildNode();
     }
     return true;

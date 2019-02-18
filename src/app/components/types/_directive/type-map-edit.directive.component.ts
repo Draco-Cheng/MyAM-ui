@@ -16,7 +16,7 @@ export class TypeMapEditDirectiveComponent implements OnInit {
   // -------------------------------------
   // neceesary input
   @Input() typesFlat?: Object;
-  @Input() typesMapFlatMetaInput?: Object;
+  @Input() typesMapFlatMeta?: Object;
   // *************************************
   // internal input
   @Input() parentNodes?: string;
@@ -26,7 +26,6 @@ export class TypeMapEditDirectiveComponent implements OnInit {
   public childNode;
   private showParentSelectPopOut;
   private disabledTids = {};
-  private typesMapFlatMeta;
 
   constructor(
     private typeService: TypeService
@@ -35,13 +34,11 @@ export class TypeMapEditDirectiveComponent implements OnInit {
   ngOnInit() {
     this.parentNodes = this.parentNodes || '';
     this.currentNode && (this.parentNodes += this.currentNode + ',');
-    this.typesMapFlatMeta = this.typesMapFlatMetaInput;
     this.disabledTids[this.currentNode] = true;
     this.getChildNode();
   }
   __checkDataUpToDate() {
     if (this.typesMapFlatMeta['legacy']) {
-      this.typesMapFlatMeta = this.typesMapFlatMetaInput;
       this.getChildNode();
     }
     return true;

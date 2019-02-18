@@ -14,7 +14,7 @@ export class RecordSumTypeMapFragmentDirectiveComponent implements OnInit {
   // -------------------------------------
   // neceesary input
   @Input() typesFlat: any;
-  @Input() typesMapFlatMetaInput: any;
+  @Input() typesMapFlatMeta: any;
   @Input() typeSummerize: any;
   @Input() currencyEx: Function;
   @Input() defaultCid: any;
@@ -27,14 +27,12 @@ export class RecordSumTypeMapFragmentDirectiveComponent implements OnInit {
   // *************************************
 
   public childNode;
-  private _typesMapFlatMeta;
 
   constructor() { }
 
   ngOnInit() {
     this.parentNodes = this.parentNodes || '';
     this.currentNode && (this.parentNodes += this.currentNode + ',');
-    this._typesMapFlatMeta = this.typesMapFlatMetaInput;
     this.getChildNode();
   }
 
@@ -43,7 +41,7 @@ export class RecordSumTypeMapFragmentDirectiveComponent implements OnInit {
     const _currentNode = this.currentNode;
     const _typesFlat = this.typesFlat;
     const _typeSummerize = this.typeSummerize;
-    const _typesMapFlat = this._typesMapFlatMeta['data'];
+    const _typesMapFlat = this.typesMapFlatMeta['data'];
     const _childNodes = this.childNode = [];
 
     if (_currentNode) {
