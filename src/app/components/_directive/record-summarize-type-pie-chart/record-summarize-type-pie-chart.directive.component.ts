@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, Input, Output, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 import { SummarizeService } from '../../../service/summarize.service';
@@ -15,15 +15,15 @@ import { NgxPieChartConf } from './ngx-pie-chart-conf';
   ]
 })
 
-export class RecordSummarizeTypePieChartDirectiveComponent {
+export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
   @Input() getTypeSummerize: Function;
 
   public __isInit = false;
   private __meta = {};
   private typesMapFlat;
-  
+
   private typePiChart;
-  private typeIdSelected = "OVERVIEW";
+  private typeIdSelected = 'OVERVIEW';
   private typeSummerize;
   private typeSummerizeForPieChart;
   private sumTidsHasChilds;
@@ -31,7 +31,7 @@ export class RecordSummarizeTypePieChartDirectiveComponent {
   constructor(
     private typeService: TypeService,
     private summarizeService: SummarizeService,
-  ) {};
+  ) { }
 
   async ngOnInit() {
     await this.getTypes();
@@ -41,60 +41,64 @@ export class RecordSummarizeTypePieChartDirectiveComponent {
 
   async getTypes() {
     this.typesMapFlat = (await this.typeService.getFlatMap())['data'];
-  };
+  }
 
   async buildSummerize() {
-    let _typeIdsForChart = [];
+    const _typeIdsForChart = [];
 
     this.typeSummerize = this.getTypeSummerize();
 
     await this.buildPieChartData(this.typeSummerize);
 
-    this.typeIdSelected = "OVERVIEW";
+    this.typeIdSelected = 'OVERVIEW';
     this.sumTidsHasChilds = await this.getSumTidsHasChilds(this.typeSummerize);
   }
 
   async getSumTidsHasChilds(summerize) {
-    let _summerize = summerize || this.typeSummerize;
-    let _typesMapFlat = this.typesMapFlat;
+    summerize = summerize || this.typeSummerize;
+    const typesMapFlat = this.typesMapFlat;
 
-    let _sumTypeIds = Object.keys(_summerize['types']);
-    let _sumTypeParentTidsFlat = {};
+    const sumTypeIds = Object.keys(summerize['types']);
+    const sumTypeParentTidsFlat = {};
 
-    _sumTypeIds.forEach( tid => {
-      !!_typesMapFlat[tid] && Object.assign(_sumTypeParentTidsFlat, _typesMapFlat[tid]['parents']);
+    sumTypeIds.forEach(tid => {
+      !!typesMapFlat[tid] && Object.assign(sumTypeParentTidsFlat, typesMapFlat[tid]['parents']);
     });
 
-    return Object.keys(_sumTypeParentTidsFlat);
-    
+    return Object.keys(sumTypeParentTidsFlat);
+
   }
 
-  async buildPieChartData(summerize ? ) {
-    let _summerize = summerize || this.typeSummerize;
+  async buildPieChartData(summerize?) {
+    summerize = summerize || this.typeSummerize;
 
 
-    let _typeListChild;
-    let _typeListUnclassified;
-    let _childsList;
-    let _showTypeNone;
+    let typeListChild;
+    let typeListUnclassified;
+    let childsList;
+    let showTypeNone;
     switch (this.typeIdSelected) {
-      case "OVERVIEW":
-         _childsList= await this.typeService.getChildsInNextLayer(null, true);
-        _typeListChild = _childsList['childs'];
-        _typeListUnclassified = _childsList['unclassified'];
-        _showTypeNone = true;
+      case 'OVERVIEW':
+        childsList = await this.typeService.getChildsInNextLayer(null, true);
+        typeListChild = childsList['childs'];
+        typeListUnclassified = childsList['unclassified'];
+        showTypeNone = true;
         break;
-      case "UNCLASSIFIED_TYPE":
-        _childsList = await this.typeService.getChildsInNextLayer(null, true);
-        _typeListChild = _childsList['unclassified'];
+      case 'UNCLASSIFIED_TYPE':
+        childsList = await this.typeService.getChildsInNextLayer(null, true);
+        typeListChild = childsList['unclassified'];
         break;
       default:
-        _childsList = await this.typeService.getChildsInNextLayer(parseInt(this.typeIdSelected), true);
-        _typeListChild = _childsList['childs'];
+        childsList = await this.typeService.getChildsInNextLayer(parseInt(this.typeIdSelected, 10), true);
+        typeListChild = childsList['childs'];
         break;
     }
 
-    let _pieCharData = await this.summarizeService.typeSummerizeToPieChart(_summerize, _typeListChild, _typeListUnclassified, _showTypeNone);
+    const _pieCharData = await this.summarizeService.typeSummerizeToPieChart(
+      summerize,
+      typeListChild,
+      typeListUnclassified,
+      showTypeNone);
     this.typeSummerizeForPieChart = new NgxPieChartConf(_pieCharData);
   }
 

@@ -11,10 +11,10 @@ import { RecordSumTypeMapFragmentDirectiveComponent } from './record-sum-type-ma
 @NgModule({
   imports: [CommonModule, FormsModule],
   declarations: [
-	  RecordSummarizeTypeFlatDirectiveComponent,
-	  RecordSumTypeMapFragmentDirectiveComponent
+    RecordSummarizeTypeFlatDirectiveComponent,
+    RecordSumTypeMapFragmentDirectiveComponent
   ],
   providers: [],
   exports: [RecordSummarizeTypeFlatDirectiveComponent]
 })
-export class RecordSummarizeTypeFlatDirectiveModule {}
+export class RecordSummarizeTypeFlatDirectiveModule { }

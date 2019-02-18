@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'content-mid-center',
+  selector: 'app-content-mid-center',
   templateUrl: './about.template.html',
   providers: []
 })

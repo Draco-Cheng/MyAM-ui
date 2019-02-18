@@ -21,129 +21,132 @@ import profileMap from './profile.map.json';
     private notificationHandler: NotificationHandler
   ) {
     this.encrypt = cryptHandler.encrypt;
-  };
+  }
 
   getConfig() {
     return this.config.get();
   }
 
   async updateConfigProfile() {
-    const _urlProfile = this.endpoint_profile + '/get';
-    const _resaultProfile = await this.request.post(_urlProfile);
-    let _userProfile;
+    const urlProfile = this.endpoint_profile + '/get';
+    const resaultProfile = await this.request.post(urlProfile);
+    let userProfile;
 
-    if (!_resaultProfile['success'])
-      return this.notificationHandler.broadcast('error', _resaultProfile['message']);
+    if (!resaultProfile['success']) {
+      return this.notificationHandler.broadcast('error', resaultProfile['message']);
+    }
 
-    _userProfile = _resaultProfile['data']['user'][0];
+    userProfile = resaultProfile['data']['user'][0];
 
-    if(_userProfile['status'] >= 20){
-      const _urlDbList = this.endpoint_db + '/dbList';
-      const _resaultDbList = await this.request.post(_urlDbList);
+    if (userProfile['status'] >= 20) {
+      const urlDbList = this.endpoint_db + '/dbList';
+      const resaultDbList = await this.request.post(urlDbList);
 
-      if (!_resaultDbList['success'])
-        return this.notificationHandler.broadcast('error', _resaultDbList['message']);
+      if (!resaultDbList['success']) {
+        return this.notificationHandler.broadcast('error', resaultDbList['message']);
+      }
 
-      _userProfile['dbList'] = _resaultDbList['data']['dbList'];
-    }    
+      userProfile['dbList'] = resaultDbList['data']['dbList'];
+    }
 
-    this.config.setUserProfile(_userProfile);
+    this.config.setUserProfile(userProfile);
   }
 
   async getBreakpointDbList(database) {
-    const _url = this.endpoint_db + '/breakpoint/list';
-    const _data = {
+    const url = this.endpoint_db + '/breakpoint/list';
+    const data = {
       db: database
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    }
 
-    return _resault;
+    return resault;
   }
 
-
-
   async delBreakpointDb(database, breakpoint) {
-    const _url = this.endpoint_db + '/breakpoint/del';
-    const _data = {
+    const url = this.endpoint_db + '/breakpoint/del';
+    const data = {
       db: database,
       breakpoint: breakpoint
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-    else
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    } else {
       this.notificationHandler.broadcast('success', 'Deleted success!');
+    }
 
-    return _resault;
+    return resault;
   }
 
   async createDB(dbName, mainCurrenciesType) {
-    const _url = this.endpoint_db + '/create';
-    const _data = {
+    const url = this.endpoint_db + '/create';
+    const data = {
       db: dbName,
       mainCurrenciesType: mainCurrenciesType
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success']){
-      this.notificationHandler.broadcast('error', _resault['message']);
-      return _resault;
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+      return resault;
     }
 
     await this.updateConfigProfile();
 
     this.notificationHandler.broadcast('success', 'Created success!');
 
-    return _resault;
+    return resault;
   }
 
   async uploadDB(dbName, file) {
-    const _url = this.endpoint_db + '/upload';
-    const _data = {
+    const url = this.endpoint_db + '/upload';
+    const data = {
       name: dbName,
       file: file
     };
 
-    const _resault = await this.request.upload(_url, _data);
+    const resault = await this.request.upload(url, data);
 
-    if (_resault['success']) {
+    if (resault['success']) {
       this.notificationHandler.broadcast('success', 'Upload success!');
       await this.updateConfigProfile();
     } else {
-      this.notificationHandler.broadcast('error', _resault['message']);
+      this.notificationHandler.broadcast('error', resault['message']);
     }
 
-    return _resault;
+    return resault;
   }
 
   async delDB(dbName) {
-    const _url = this.endpoint_db + '/del';
-    const _data = {
+    const url = this.endpoint_db + '/del';
+    const data = {
       db: dbName
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
     await this.updateConfigProfile();
 
-    if (_resault['success'] && dbName == this.config.get('database')) {
+    if (resault['success'] && dbName === this.config.get('database')) {
       this.config.set('database', '');
       this.setActiveDb('');
     }
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-    else
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    } else {
       this.notificationHandler.broadcast('success', 'Updated success!');
+    }
 
-    return _resault;
+    return resault;
   }
 
   wipeCache() {
@@ -161,81 +164,83 @@ import profileMap from './profile.map.json';
     this.wipeCache();
   }
 
-  async downloadDb(dbName, breakpoint ? ) {
-    const _url = this.endpoint_db + '/download';
+  async downloadDb(dbName, breakpoint?) {
+    const url = this.endpoint_db + '/download';
 
-    let _data = {}
-    _data['db'] = dbName;
+    const data = {};
+    data['db'] = dbName;
 
     if (breakpoint) {
-      _data['breakpoint'] = breakpoint;
+      data['breakpoint'] = breakpoint;
     }
 
-    const _resault = await this.request.download(_url, _data);
+    const resault = await this.request.download(url, data);
 
-    return _resault;
+    return resault;
   }
 
   async renameDb(dbName, newDbName) {
-    const _url = this.endpoint_db + '/rename';
+    const url = this.endpoint_db + '/rename';
 
-    let _data = {}
-    _data['db'] = dbName;
-    _data['newDbName'] = newDbName;
+    const data = {};
+    data['db'] = dbName;
+    data['newDbName'] = newDbName;
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
     await this.updateConfigProfile();
 
-    if (_resault['success'] && dbName == this.config.get('database')) {
+    if (resault['success'] && dbName === this.config.get('database')) {
       this.config.set('database', newDbName);
       this.setActiveDb(newDbName);
     }
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-    else
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    } else {
       this.notificationHandler.broadcast('success', 'Updated success!');
+    }
 
-    return _resault;
+    return resault;
   }
 
   async set(formObj) {
-    const _url = this.endpoint_profile + '/set';
-    const _currentProfile = this.config.get('user');
+    const url = this.endpoint_profile + '/set';
+    const currentProfile = this.config.get('user');
 
-    const _data = {};
+    const data = {};
 
     ['breakpoint', 'mail', 'name'].forEach(key => {
-      if (_currentProfile[key] != formObj[key])
-        _data[key] = formObj[key];
+      if (currentProfile[key] !== formObj[key]) {
+        data[key] = formObj[key];
+      }
     });
 
     if (formObj['pwd'] && formObj['pwd2']) {
-      _data['token'] = this.encrypt(this.encrypt(formObj['pwd']));
-      _data['token2'] = this.encrypt(formObj['pwd2']);
+      data['token'] = this.encrypt(this.encrypt(formObj['pwd']));
+      data['token2'] = this.encrypt(formObj['pwd2']);
     }
 
-    if (Object.keys(_data).length) {
-      const _resault = await this.request.post(_url, _data);
+    if (Object.keys(data).length) {
+      const resault = await this.request.post(url, data);
 
-      if (!_resault['success']) {
-        this.notificationHandler.broadcast('error', _resault['message']);
+      if (!resault['success']) {
+        this.notificationHandler.broadcast('error', resault['message']);
         return;
       }
 
-      if (_data['token']) {
+      if (data['token']) {
         location.href = '';
       } else {
         this.notificationHandler.broadcast('success', 'Updated success!');
         await this.updateConfigProfile();
-        return { data: _resault };
+        return { data: resault };
       }
 
     }
   }
 
-  getProfileMap(){
+  getProfileMap() {
     return profileMap;
   }
 }

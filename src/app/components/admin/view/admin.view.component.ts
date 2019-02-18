@@ -1,12 +1,8 @@
-import { Component } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
+import * as _ from 'lodash';
 
 import { AdminServer } from '../../../service/admin.service';
 import { ProfileService } from '../../../service/profile.service';
-
-function cloneObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-};
 
 @Component({
   selector: 'admin-content',
@@ -18,7 +14,7 @@ function cloneObj(obj) {
   ]
 })
 
-export class AdminViewComponent {
+export class AdminViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
@@ -31,25 +27,25 @@ export class AdminViewComponent {
     private adminServer: AdminServer
   ) {
 
-  };
-
+  }
 
   async ngOnInit() {
     this.__meta['userList'] = await this.adminServer.getUserList();
-    this.userList = cloneObj(this.__meta['userList']['data']);
+    this.userList = _.cloneDeep(this.__meta['userList']['data']);
     this.profileMap = this.profileService.getProfileMap();
 
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {}
 
   loginInfoToStr(str) {
-    if (!str)
+    if (!str) {
       return [];
+    }
 
-    let _info = str.split('|');
-    return [_info[0], this.dateString(_info[1])];
+    const info = str.split('|');
+    return [info[0], this.dateString(info[1])];
   }
 
   dateString(time) {
@@ -61,39 +57,39 @@ export class AdminViewComponent {
   }
 
   async resetPwd(user) {
-    let _data = {
+    const data = {
       target_uid: user['uid'],
       newPwd: user['newPwd']
     };
 
-    await this.adminServer.setUser(_data);
+    await this.adminServer.setUser(data);
 
     user['newPwd'] = '';
 
   }
 
   async updateUser(user) {
-    let _data = {
+    const data = {
       target_uid: user['uid'],
-      status: user['status'] * 1,
-      permission: user['permission'] * 1
-    }
+      status: _.parseInt(user['status']),
+      permission: _.parseInt(user['permission'])
+    };
 
-    let _resault = await this.adminServer.setUser(_data);
+    const resault = await this.adminServer.setUser(data);
 
-    if (_resault['success']) {
-      for (let _metaUser of this.__meta['userList']['data']) {
-        if (_metaUser['uid'] == user['uid']) {
-          _metaUser['status'] = user['status'];
-          _metaUser['permission'] = user['permission'];
+    if (resault['success']) {
+      for (const metaUser of this.__meta['userList']['data']) {
+        if (metaUser['uid'] === user['uid']) {
+          metaUser['status'] = user['status'];
+          metaUser['permission'] = user['permission'];
           return;
         }
       }
     } else {
-      for (let _metaUser of this.__meta['userList']['data']) {
-        if (_metaUser['uid'] == user['uid']) {
-          user['status'] = _metaUser['status'];
-          user['permission'] = _metaUser['permission'];
+      for (const metaUser of this.__meta['userList']['data']) {
+        if (metaUser['uid'] === user['uid']) {
+          user['status'] = metaUser['status'];
+          user['permission'] = metaUser['permission'];
           return;
         }
       }

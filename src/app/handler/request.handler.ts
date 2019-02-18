@@ -1,37 +1,38 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import * as _ from 'lodash';
 
 import { i18n } from '../i18n/i18n';
 
 import { ConfigHandler } from './config.handler';
 import { CryptHandler } from './crypt.handler';
 
-var buildResObj = (arg0 ? , arg1 ? , arg2 ? ) => {
-  let _obj = {
+const buildResObj = (arg0?, arg1?, arg2?) => {
+  const obj = {
     success: null,
     code: null,
     message: null,
     data: null
   };
 
-  _obj.success = arg0 == 200;
-  _obj.code = arg0;
+  obj.success = arg0 === 200;
+  obj.code = arg0;
 
   if (arg2 === undefined) {
-    if (typeof arg1 == 'string') {
-      _obj.message = arg1;
-      _obj.data = null;
+    if (typeof arg1 === 'string') {
+      obj.message = arg1;
+      obj.data = null;
     } else {
-      _obj.message = '';
-      _obj.data = arg1;
+      obj.message = '';
+      obj.data = arg1;
     }
   } else {
-    _obj.message = arg1;
-    _obj.data = arg2;
+    obj.message = arg1;
+    obj.data = arg2;
   }
 
-  return _obj;
-}
+  return obj;
+};
 
 @Injectable() export class RequestHandler {
   private encrypt;
@@ -43,48 +44,48 @@ var buildResObj = (arg0 ? , arg1 ? , arg2 ? ) => {
     private cryptHandler: CryptHandler
   ) {
     this.encrypt = cryptHandler.encrypt;
-  };
+  }
 
   headers = new Headers({
     'Content-Type': 'application/json'
   });
 
-  async post(path: string, formObj ? : any) {
-    let _data = formObj ? JSON.parse(JSON.stringify(formObj)) : {};
-    let _salt = Date.now().toString();
+  async post(path: string, formObj: any = {}) {
+    const data = _.cloneDeep(formObj);
+    const salt = Date.now().toString();
 
-    _data['db'] = (formObj && formObj['db']) || this.config.get('database');
+    data['db'] = (formObj && formObj['db']) || this.config.get('database');
 
-    if (!_data['db'] && path.indexOf('/profile') == -1 && path.indexOf('/db/dbList') == -1 && path.indexOf('/auth') == -1) {
-      console.error('[NO_DB_SELECT]',path, formObj)
+    if (!data['db'] && path.indexOf('/profile') === -1 && path.indexOf('/db/dbList') === -1 && path.indexOf('/auth') === -1) {
+      console.error('[NO_DB_SELECT]', path, formObj);
       return { code: '401', message: 'NO_DB_SELECT', success: false, data: null };
     }
 
-    this.headers.set('Auth-Salt', _salt);
-    this.headers.set('Auth-Token', this.encrypt(this.authTokenBase + _salt));
+    this.headers.set('Auth-Salt', salt);
+    this.headers.set('Auth-Token', this.encrypt(this.authTokenBase + salt));
 
     // <any[]> predefine resolve return value type
-    return new Promise < any > ((resolve, reject) => {
-      this.http.post(this.config.get('server_domain') + path, JSON.stringify(_data), { headers: this.headers })
+    return new Promise<any>((resolve, reject) => {
+      this.http.post(this.config.get('server_domain') + path, JSON.stringify(data), { headers: this.headers })
         .subscribe(
-          data => resolve(buildResObj(data.status, data.json())),
+          responseData => resolve(buildResObj(responseData.status, responseData.json())),
           error => {
             let _msg;
             try {
               _msg = i18n('ajax', error.json()['message']) || error.json()['message'];
             } catch (e) {
               _msg = error;
-            };
-            resolve(buildResObj(error.status, _msg))
+            }
+            resolve(buildResObj(error.status, _msg));
           }
         );
     });
-  };
+  }
 
   downloadFile(fileName, data) {
-    var blob = new Blob([data], { type: 'multipart/form-data' });
-    var url = window.URL.createObjectURL(data);
-    var a = document.createElement("a");
+    const blob = new Blob([data], { type: 'multipart/form-data' });
+    const url = window.URL.createObjectURL(data);
+    const a = document.createElement('a');
 
     a.href = url;
     a.download = fileName;
@@ -93,24 +94,23 @@ var buildResObj = (arg0 ? , arg1 ? , arg2 ? ) => {
   }
 
   async download(path: string, formObj: {}) {
-    let _salt = Date.now().toString();
+    const salt = Date.now().toString();
 
     formObj['db'] = formObj['db'] || this.config.get('database');
 
     return new Promise((resolve, reject) => {
-
-      var xhttp = new XMLHttpRequest();
-      xhttp.open("POST", this.config.get('server_domain') + path, true);
-      xhttp.responseType = "blob";
+      const xhttp = new XMLHttpRequest();
+      xhttp.open('POST', this.config.get('server_domain') + path, true);
+      xhttp.responseType = 'blob';
       xhttp.onreadystatechange = () => {
-        if (xhttp.readyState == 4) {
-          if (xhttp.status == 200) {
+        if (xhttp.readyState === 4) {
+          if (xhttp.status === 200) {
             this.downloadFile(xhttp.getResponseHeader('x-filename'), xhttp.response);
           }
 
           let _res;
           try {
-            let _msg = JSON.parse(xhttp.response)['message'];
+            const _msg = JSON.parse(xhttp.response)['message'];
             _res = i18n('ajax', _msg) || _msg;
           } catch (e) {
             _res = xhttp.response;
@@ -121,8 +121,8 @@ var buildResObj = (arg0 ? , arg1 ? , arg2 ? ) => {
       };
 
       xhttp.setRequestHeader('Auth-UID', this.headers.get('Auth-UID'));
-      xhttp.setRequestHeader('Auth-Salt', _salt);
-      xhttp.setRequestHeader('Auth-Token', this.encrypt(this.authTokenBase + _salt));
+      xhttp.setRequestHeader('Auth-Salt', salt);
+      xhttp.setRequestHeader('Auth-Token', this.encrypt(this.authTokenBase + salt));
       xhttp.setRequestHeader('Content-Type', 'application/json');
 
       xhttp.send(JSON.stringify(formObj));
@@ -130,124 +130,122 @@ var buildResObj = (arg0 ? , arg1 ? , arg2 ? ) => {
   }
 
   async upload(path: string, formObj: {}) {
-    let _salt = Date.now().toString();
-    let _formData = new FormData();
-    let _self = this;
+    const salt = Date.now().toString();
+    const formData = new FormData();
 
     return new Promise((resolve, reject) => {
+      const xhttp = new XMLHttpRequest();
 
-      var xhttp = new XMLHttpRequest();
-
-      xhttp.upload.addEventListener("progress", evt => {
+      xhttp.upload.addEventListener('progress', evt => {
         if (evt.lengthComputable) {
-          console.log('Upload progress: ', evt.loaded + '/' + evt.total)
-        } else {
-          // No data to calculate on
+          console.log('Upload progress: ', evt.loaded + '/' + evt.total);
         }
       }, false);
 
-      xhttp.addEventListener("load", () => {
-        let _res;
+      xhttp.addEventListener('load', () => {
+        let res;
         try {
-          let _msg = JSON.parse(xhttp.response)['message'];
-          _res = i18n('ajax', _msg) || _msg;
+          const msg = JSON.parse(xhttp.response)['message'];
+          res = i18n('ajax', msg) || msg;
         } catch (e) {
-          _res = xhttp.response;
+          res = xhttp.response;
         }
 
-        resolve(buildResObj(xhttp.status, _res));
+        resolve(buildResObj(xhttp.status, res));
       }, false);
 
       xhttp.open('POST', this.config.get('server_domain') + path, true);
       xhttp.setRequestHeader('Auth-UID', this.headers.get('Auth-UID'));
-      xhttp.setRequestHeader('Auth-Salt', _salt);
-      xhttp.setRequestHeader('Auth-Token', this.encrypt(this.authTokenBase + _salt));
-      xhttp.onload = function(e) {};
+      xhttp.setRequestHeader('Auth-Salt', salt);
+      xhttp.setRequestHeader('Auth-Token', this.encrypt(this.authTokenBase + salt));
+      xhttp.onload = function (e) { };
 
-      for (let _key in formObj) {
-        _formData.append(_key, formObj[_key]);
-      }
+      Object.keys(formObj)
+        .forEach(key => {
+          formData.append(key, formObj[key]);
+        });
 
-      xhttp.send(_formData); // multipart/form-data
+      xhttp.send(formData); // multipart/form-data
     });
   }
 
 
-  async login(path: string, formObj: any) {
-    let _data = {};
-    let _salt = Date.now();
-    let _formObj = formObj ? JSON.parse(JSON.stringify(formObj)) : {};
+  async login(path: string, formObj: any = {}) {
+    const postData = {};
+    const salt = Date.now();
+    formObj = _.cloneDeep(formObj);
 
-    _data['acc'] = _formObj['acc'];
-    _data['salt'] = _salt;
-    _data['token'] = this.encrypt(this.encrypt(_formObj['pwd']) + _salt);
-    _data['keep'] = _formObj['keep'];
+    postData['acc'] = formObj['acc'];
+    postData['salt'] = salt;
+    postData['token'] = this.encrypt(this.encrypt(formObj['pwd']) + salt);
+    postData['keep'] = formObj['keep'];
 
     // <any[]> predefine resolve return value type
-    return new Promise < any > ((resolve, reject) => {
-      this.http.post(this.config.get('server_domain') + path, JSON.stringify(_data), { headers: this.headers })
+    return new Promise<any>((resolve, reject) => {
+      this.http.post(this.config.get('server_domain') + path, JSON.stringify(postData), { headers: this.headers })
         .subscribe(
-          data => {
-            let _data = data.json();
-            let _uid = _data['uid'];
+          responseData => {
+            const responseJson = responseData.json();
+            const uid = responseJson['uid'];
 
-            this.authTokenBase = this.encrypt(_salt + this.encrypt(_formObj['pwd']));
+            this.authTokenBase = this.encrypt(salt + this.encrypt(formObj['pwd']));
 
-            if (_formObj['keep']) {
-              localStorage.setItem('token', _uid + ',' + this.encrypt(_salt + _salt + this.encrypt(_formObj['pwd'])));
+            if (formObj['keep']) {
+              localStorage.setItem('token', uid + ',' + this.encrypt(salt + salt + this.encrypt(formObj['pwd'])));
             } else {
               localStorage.removeItem('token');
             }
 
-            this.headers.set('Auth-UID', _data['uid']);
+            this.headers.set('Auth-UID', responseJson['uid']);
 
-            resolve(buildResObj(data.status, _data));
+            resolve(buildResObj(responseData.status, responseJson));
           }, error => {
-            let _msg;
+            let msg;
             try {
-              _msg = i18n('ajax', error.json()['message']) || error.json()['message'];
+              msg = i18n('ajax', error.json()['message']) || error.json()['message'];
             } catch (e) {
-              _msg = error;
-            };
-            resolve(buildResObj(error.status, _msg))
-          });
-    });
-  };
+              msg = error;
+            }
 
-  async loginByToken(path: string, formObj: any) {
-    let _data = {};
-    let _salt = Date.now();
-    let _formObj = formObj ? JSON.parse(JSON.stringify(formObj)) : {};
-
-    _data['uid'] = _formObj['uid'];
-    _data['salt'] = _salt;
-    _data['token'] = this.encrypt(_formObj['token'] + _salt);
-
-
-    // <any[]> predefine resolve return value type
-    return new Promise < any > ((resolve, reject) => {
-      this.http.post(this.config.get('server_domain') + path, JSON.stringify(_data), { headers: this.headers })
-        .subscribe(
-          data => {
-            let _data = data.json();
-            let _uid = _data['uid'];
-
-            this.authTokenBase = this.encrypt(_salt + _formObj['token']);
-            localStorage.setItem('token', _uid + ',' + this.encrypt(_salt + _salt + _formObj['token']));
-
-            this.headers.set('Auth-UID', _data['uid']);
-
-            resolve(buildResObj(data.status, _data));
-          }, error => {
-            let _msg;
-            try {
-              _msg = i18n('ajax', error.json()['message']) || error.json()['message'];
-            } catch (e) {
-              _msg = error;
-            };
-            resolve(buildResObj(error.status, _msg))
+            resolve(buildResObj(error.status, msg));
           });
     });
   }
 
-};
+  async loginByToken(path: string, formObj: any = {}) {
+    const postData = {};
+    const salt = Date.now();
+    formObj = _.cloneDeep(formObj);
+
+    postData['uid'] = formObj['uid'];
+    postData['salt'] = salt;
+    postData['token'] = this.encrypt(formObj['token'] + salt);
+
+
+    // <any[]> predefine resolve return value type
+    return new Promise<any>((resolve, reject) => {
+      this.http.post(this.config.get('server_domain') + path, JSON.stringify(postData), { headers: this.headers })
+        .subscribe(
+          reponseData => {
+            const reponseJson = reponseData.json();
+            const uid = reponseJson['uid'];
+
+            this.authTokenBase = this.encrypt(salt + formObj['token']);
+            localStorage.setItem('token', uid + ',' + this.encrypt(salt + salt + formObj['token']));
+
+            this.headers.set('Auth-UID', reponseJson['uid']);
+
+            resolve(buildResObj(reponseData.status, reponseJson));
+          }, error => {
+            let _msg;
+            try {
+              _msg = i18n('ajax', error.json()['message']) || error.json()['message'];
+            } catch (e) {
+              _msg = error;
+            }
+            resolve(buildResObj(error.status, _msg));
+          });
+    });
+  }
+
+}

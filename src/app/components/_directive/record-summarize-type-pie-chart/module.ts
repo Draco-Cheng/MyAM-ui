@@ -9,14 +9,14 @@ import { RecordSummarizeTypePieChartDirectiveComponent } from './record-summariz
 
 @NgModule({
   imports: [
-  	CommonModule,
-  	FormsModule,
-  	NgxChartsModule
+    CommonModule,
+    FormsModule,
+    NgxChartsModule
   ],
   declarations: [
-	  RecordSummarizeTypePieChartDirectiveComponent
+    RecordSummarizeTypePieChartDirectiveComponent
   ],
   providers: [],
   exports: [RecordSummarizeTypePieChartDirectiveComponent]
 })
-export class RecordSummarizeTypePieChartDirectiveModule {}
+export class RecordSummarizeTypePieChartDirectiveModule { }

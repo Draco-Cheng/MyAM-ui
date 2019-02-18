@@ -27,69 +27,69 @@ import {
     private notificationHandler: NotificationHandler
   ) {
     this.encrypt = cryptHandler.encrypt;
-  };
+  }
 
 
   async login(formObj: any) {
-    const _url = this.endpoint + '/login';
-    console.log("[AuthService] login:", formObj['acc']);
+    const url = this.endpoint + '/login';
+    console.log('[AuthService] login:', formObj['acc']);
 
-    let _res = await this.request.login(_url, formObj);
+    const res = await this.request.login(url, formObj);
 
-    if (_res['success']) {
-      await this.config.setUserProfile(_res['data']);
-      this.router.navigate(_res['data']['dbList'].length ? ['/dashboard'] : ['/profile']);
+    if (res['success']) {
+      await this.config.setUserProfile(res['data']);
+      this.router.navigate(res['data']['dbList'].length ? ['/dashboard'] : ['/profile']);
     } else {
       this.notificationHandler.broadcast('error', 'Login Fail!');
     }
   }
 
   async loginByToken() {
-    const _url = this.endpoint + '/login';
-    const _loginInfo = localStorage.getItem('token').split(',');
-    let _res = await this.request.loginByToken(_url, { uid: _loginInfo[0], token: _loginInfo[1] });
+    const url = this.endpoint + '/login';
+    const loginInfo = localStorage.getItem('token').split(',');
+    const res = await this.request.loginByToken(url, { uid: loginInfo[0], token: loginInfo[1] });
 
-    if (_res['success']) {
-      await this.config.setUserProfile(_res['data']);
-      !_res['data']['dbList'].length && this.router.navigate(['/profile']);
+    if (res['success']) {
+      await this.config.setUserProfile(res['data']);
+      !res['data']['dbList'].length && this.router.navigate(['/profile']);
     }
 
-    return !!_res['success'];
+    return !!res['success'];
   }
 
   async logout() {
-    const _url = this.endpoint + '/logout';
-    console.log("[AuthService] logout");
+    const url = this.endpoint + '/logout';
+    console.log('[AuthService] logout');
 
-    let _res = await this.request.post(_url);
+    const res = await this.request.post(url);
 
-    if (_res) {
+    if (res) {
       localStorage.removeItem('token');
     }
   }
 
   async register(formObject) {
-    const _url = this.endpoint + '/register';
+    const url = this.endpoint + '/register';
 
-    const _data = {};
+    const data = {};
 
-    _data['name'] = formObject['name'];
-    _data['account'] = formObject['account'];
-    _data['token'] = this.encrypt(formObject['pwd']);
-    _data['mail'] = formObject['mail'];
+    data['name'] = formObject['name'];
+    data['account'] = formObject['account'];
+    data['token'] = this.encrypt(formObject['pwd']);
+    data['mail'] = formObject['mail'];
 
-    console.log("[AuthService] register");
+    console.log('[AuthService] register');
 
-    let _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success']) {
-      this.notificationHandler.broadcast('error', _resault['message']);
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
     } else {
       this.notificationHandler.broadcast('success', 'Register account success!');
       this.router.navigate(['/login']);
     }
 
-    return _resault;
+    return resault;
   }
 
 }
@@ -103,7 +103,7 @@ import {
     private request: RequestHandler,
     private authService: AuthService,
     private notificationHandler: NotificationHandler
-  ) {};
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     console.log('AuthGuard#canActivate called');

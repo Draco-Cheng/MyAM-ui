@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import * as _ from 'lodash';
 
 import { RecordsService } from '../../../service/records.service';
 
@@ -6,20 +7,20 @@ import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 
 function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
+  const d = new Date(date);
+  let month = '' + (d.getMonth() + 1);
+  let day = '' + d.getDate();
+  const year = d.getFullYear();
 
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
+  if (month.length < 2) {
+    month = '0' + month;
+  }
+  if (day.length < 2) {
+    day = '0' + day;
+  }
 
   return [year, month, day].join('-');
 }
-
-function cloneObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-};
 
 @Component({
   selector: 'records-content',
@@ -32,7 +33,7 @@ function cloneObj(obj) {
   ]
 })
 
-export class RecordsAddComponent {
+export class RecordsAddComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
@@ -43,26 +44,28 @@ export class RecordsAddComponent {
   private loading = false;
 
   private newRecord = {
+    rid: null,
     cashType: -1,
     value: 0,
     tids: {},
     memo: '',
     date: formatDate(Date.now()),
-    cid: ''
+    cid: '',
+    tidsObjMap: null
   };
 
   constructor(
     private recordsService: RecordsService,
     private typeService: TypeService,
     private currencyService: CurrencyService
-  ) { };
+  ) { }
 
   async ngOnInit() {
     await this.getRecord();
     await this.getTypes();
     this.newRecord.cid = this.currencyService.getDefaultCid();
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['types']['legacy']) {
@@ -73,7 +76,7 @@ export class RecordsAddComponent {
   async getRecord() {
     this.__meta['records'] = await this.recordsService.get();
     this.records = this.__meta['records']['data'];
-  };
+  }
 
   async getTypes() {
     this.__meta['types'] = await this.typeService.get();
@@ -81,19 +84,21 @@ export class RecordsAddComponent {
     this.types.forEach(element => {
       this.typesFlat[element.tid] = element;
     });
-  };
+  }
 
   async addRecord() {
-    let _record = cloneObj(this.newRecord);
+    const _record = _.cloneDeep(this.newRecord);
     const _resault = await this.recordsService.set(_record);
 
-    if (!_resault.success) return;
+    if (!_resault.success) {
+      return;
+    }
 
     _record.rid = _resault['data'][0].rid;
-    const _resault2 = await this.recordsService.setType(_record.rid, Object.keys(_record.tids));
+    await this.recordsService.setType(_record.rid, Object.keys(_record.tids));
 
     if (_resault) {
-      let _map = {};
+      const _map = {};
       _record.tidsObjMap = _record.tids;
       _record.tids = Object.keys(_record.tids);
 
@@ -103,18 +108,12 @@ export class RecordsAddComponent {
       this.newRecord.tids = {};
       this.newRecord.memo = '';
     }
-  };
+  }
 
   submitNewRecord() {
     this.loading = true;
     this.addRecord()
       .then(() => this.loading = false);
-  }
-
-  async currencyExchange(records) {
-    // for(let record of records){
-    //   record.currencyExhange = await this.currencyService.exchange(record.cid, this.defaultCid, record.value);
-    // }    
   }
 
   tidToLabel(tid: string) {
@@ -126,12 +125,12 @@ export class RecordsAddComponent {
   }
 
   getRecordTypeMapSwitch(record) {
-    let _self = this;
     return (tid) => {
-      if (this.newRecord.tids[tid])
+      if (this.newRecord.tids[tid]) {
         delete this.newRecord.tids[tid];
-      else
-        this.newRecord.tids[tid] = true;;
+      } else {
+        this.newRecord.tids[tid] = true;
+      }
     };
   }
 
@@ -142,6 +141,6 @@ export class RecordsAddComponent {
   getSelectionCallback(record) {
     return cid => {
       record.cid = cid;
-    }
+    };
   }
 }

@@ -35,7 +35,6 @@ import { RecordSummarizeLineChartDirectiveModule } from '../_directive/record-su
   declarations: [
     RecordsViewComponent,
     RecordsAddComponent,
-    
     RecordTableDirectiveComponent
   ],
   providers: []

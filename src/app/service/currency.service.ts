@@ -7,12 +7,8 @@ import { NotificationHandler } from '../handler/notification.handler';
 
 import currencyList from './currency.list.json';
 
-let currencyExchangeCache = {};
-let currencyMapForExchangeCache = null;
-
-function cloneObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-};
+const currencyExchangeMemoryCache = {};
+let currencyMapForExchangeMemoryCache = null;
 
 @Injectable() export class CurrencyService {
   private currencyList = currencyList;
@@ -26,7 +22,7 @@ function cloneObj(obj) {
   ) {
     this.get();
     this.getMap();
-  };
+  }
 
   wipe() {
     this.cacheHandler.wipe('currency');
@@ -34,18 +30,18 @@ function cloneObj(obj) {
   }
 
   setConfigCid(defaultCid, flatMap) {
-    let _uid = this.config.get('uid');
-    let _localCid = localStorage.getItem(_uid + '.cid');
-    if (_localCid && flatMap[_localCid]) {
-      this.config.set('cid', _localCid);
+    const uid = this.config.get('uid');
+    const localCid = localStorage.getItem(uid + '.cid');
+    if (localCid && flatMap[localCid]) {
+      this.config.set('cid', localCid);
     } else {
       this.config.set('cid', defaultCid);
-      localStorage.setItem(_uid + '.cid', defaultCid);
+      localStorage.setItem(uid + '.cid', defaultCid);
     }
   }
 
   getDefaultCid() {
-    return this.config.get('cid')
+    return this.config.get('cid');
   }
 
   getCurrencyList() {
@@ -53,77 +49,78 @@ function cloneObj(obj) {
   }
 
   async get(formObj?: any) {
-    const _cacheName = 'currency';
-    const _cache = await this.cacheHandler.get(_cacheName, true);
-    if (_cache.status == 1) {
-      return _cache;
+    const cacheName = 'currency';
+    const cache = await this.cacheHandler.get(cacheName, true);
+    if (cache.status === 1) {
+      return cache;
     } else {
-      const _resolveCache = this.cacheHandler.regAsyncReq(_cacheName);
-      const _url = this.endpoint + '/get';
-      const _resualt = await this.request.post(_url);
+      const resolveCache = this.cacheHandler.regAsyncReq(cacheName);
+      const url = this.endpoint + '/get';
+      const resualt = await this.request.post(url);
 
-      if (_resualt['success'])
-        return _resolveCache(_resualt['data']);
-      else
-        this.notificationHandler.broadcast('error', _resualt['message']);
+      if (resualt['success']) {
+        return resolveCache(resualt['data']);
+      } else {
+        this.notificationHandler.broadcast('error', resualt['message']);
+      }
     }
   }
 
 
   async getMap() {
-    const _cacheName = 'currency.map';
-    const _cache = await this.cacheHandler.get(_cacheName, true);
+    const cacheName = 'currency.map';
+    const cache = await this.cacheHandler.get(cacheName, true);
 
-    if (_cache.status == 1) {
-      return _cache;
+    if (cache.status === 1) {
+      return cache;
     } else {
-      const _resolveCache = this.cacheHandler.regAsyncReq(_cacheName);
-      const _currency = (await this.get())['data'];
-      let _structureMap = {};
-      let _flatMap = {};
-      let _rootCid;
-      let _mainCurrencyList = [];
+      const resolveCache = this.cacheHandler.regAsyncReq(cacheName);
+      const currency = (await this.get())['data'];
+      const structureMap = {};
+      const flatMap = {};
+      let rootCid;
 
       // build flate map
-      _currency.forEach(cur => {
-        _flatMap[cur.cid] = cur;
+      currency.forEach(cur => {
+        flatMap[cur.cid] = cur;
         cur.childs = [];
       });
 
       // put child in parent
-      _currency.forEach(cur => {
+      currency.forEach(cur => {
         if (cur.main) {
-          if (cur.to_cid)
-            _flatMap[cur.to_cid].preMain = cur.cid;
-          else
-            _rootCid = cur.cid;
+          if (cur.to_cid) {
+            flatMap[cur.to_cid].preMain = cur.cid;
+          } else {
+            rootCid = cur.cid;
+          }
         } else {
-          _flatMap[cur.to_cid].childs.push(cur);
+          flatMap[cur.to_cid].childs.push(cur);
         }
       });
 
-      // set config cid 
-      this.setConfigCid(_rootCid, _flatMap);
+      // set config cid
+      this.setConfigCid(rootCid, flatMap);
 
       do {
-        _structureMap[_rootCid] = _flatMap[_rootCid];
-        _rootCid = _flatMap[_rootCid].preMain || null;
-      } while (!!_rootCid);
+        structureMap[rootCid] = flatMap[rootCid];
+        rootCid = flatMap[rootCid].preMain || null;
+      } while (!!rootCid);
 
-      let _output = {
-        flatMap: _flatMap,
-        structureMap: _structureMap
-      }
+      const _output = {
+        flatMap: flatMap,
+        structureMap: structureMap
+      };
 
-      currencyMapForExchangeCache = _output;
+      currencyMapForExchangeMemoryCache = _output;
 
-      return _resolveCache(_output);
+      return resolveCache(_output);
     }
   }
 
   async set(formObj: any) {
-    const _url = this.endpoint + '/set';
-    const _data = {
+    const url = this.endpoint + '/set';
+    const data = {
       cid: formObj.cid,
       type: formObj.type,
       rate: formObj.rate,
@@ -135,21 +132,21 @@ function cloneObj(obj) {
     };
 
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (_resault['success']) {
+    if (resault['success']) {
       this.wipe();
       this.notificationHandler.broadcast('success', 'Updated success!');
     } else {
-      this.notificationHandler.broadcast('error', _resault['message']);
+      this.notificationHandler.broadcast('error', resault['message']);
     }
 
-    return _resault;
+    return resault;
   }
 
   async add(formObj: any) {
-    const _url = this.endpoint + '/set';
-    let _data = {
+    const url = this.endpoint + '/set';
+    const data = {
       type: formObj.type,
       rate: formObj.rate,
       to_cid: formObj.main ? null : formObj.to_cid,
@@ -159,34 +156,34 @@ function cloneObj(obj) {
       main: formObj.main
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (_resault['success']) {
+    if (resault['success']) {
       this.wipe();
       this.notificationHandler.broadcast('success', 'Add success!');
     } else {
-      this.notificationHandler.broadcast('error', _resault['message']);
+      this.notificationHandler.broadcast('error', resault['message']);
     }
 
-    return _resault;
+    return resault;
   }
 
   async del(del_cid) {
-    const _url = this.endpoint + '/del';
-    const _data = {
+    const url = this.endpoint + '/del';
+    const data = {
       del_cid: del_cid
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (_resault['success']) {
+    if (resault['success']) {
       this.wipe();
       this.notificationHandler.broadcast('success', 'Deleted success!');
     } else {
-      this.notificationHandler.broadcast('error', _resault['message']);
+      this.notificationHandler.broadcast('error', resault['message']);
     }
 
-    return _resault;
+    return resault;
   }
 
   setDefaultCid(cid) {
@@ -196,186 +193,187 @@ function cloneObj(obj) {
 
   exchange(sCid, tCid, value) {
 
-    const _sCid = (sCid || this.getDefaultCid()).toString();
-    const _tCid = (tCid || this.getDefaultCid()).toString();
+    sCid = (sCid || this.getDefaultCid()).toString();
+    tCid = (tCid || this.getDefaultCid()).toString();
 
-    let _currencyExchangeCache = currencyExchangeCache;
-    let _currencyMapForExchangeCache = currencyMapForExchangeCache;
+    const currencyExchangeCache = currencyExchangeMemoryCache;
+    const currencyMapForExchangeCache = currencyMapForExchangeMemoryCache;
 
-    if (!_currencyMapForExchangeCache) {
+    if (!currencyMapForExchangeCache) {
       return console.error('[currency.exchange] currencyMapForExchangeCache not ready... please get currency map first!');
     }
 
-    if (!_currencyExchangeCache[_sCid] || !_currencyExchangeCache[_sCid][_tCid]) {
-      const _map = _currencyMapForExchangeCache;
-      const _flatMap = _map['flatMap'];
-      const _structureMap = _map['structureMap'];
-      const _mainCurrencyList = Object.keys(_structureMap);
+    if (!currencyExchangeCache[sCid] || !currencyExchangeCache[sCid][tCid]) {
+      const map = currencyMapForExchangeCache;
+      const flatMap = map['flatMap'];
+      const structureMap = map['structureMap'];
+      const mainCurrencyList = Object.keys(structureMap);
 
-      let _sIndex = _sCid;
-      let _tIndex = _tCid;
+      let sIndex = sCid;
+      let tIndex = tCid;
 
       // the list for initial _s from sorce, _t from target cid
-      let _sList = [];
-      let _sTypeList = [];
-      let _sRateList = [];
-      let _tList = [];
-      let _tTypeList = [];
-      let _tRateList = [];
+      const sList = [];
+      const sTypeList = [];
+      const sRateList = [];
+      const tList = [];
+      const tTypeList = [];
+      const tRateList = [];
 
       // the list remove duplicate cid (precisely rate), concat from _sList and _tList
-      let _pList = [];
-      let _pTypeList = [];
-      let _pRateList = [];
+      let pList = [];
+      let pTypeList = [];
+      let pRateList = [];
 
       // the list remove duplicate type and cid, made from _pList
-      let _list = [];
-      let _typeList = [];
-      let _rateList = [];
+      let list = [];
+      let typeList = [];
+      let rateList = [];
 
-      // rate 
-      let _pRate = 1;
-      let _rate = 1;
+      // rate
+      let pRate = 1;
+      let rate = 1;
 
       // get sCid currency list to main currency
-      let _sStopFlag = false;
+      let sStopFlag = false;
       do {
-        _sList.push(_sIndex);
-        _sTypeList.push(_flatMap[_sIndex]['type']);
-        _sRateList.push(_flatMap[_sIndex]['rate']);
+        sList.push(sIndex);
+        sTypeList.push(flatMap[sIndex]['type']);
+        sRateList.push(flatMap[sIndex]['rate']);
 
-        if (!_flatMap[_sIndex]['main'])
-          _sIndex = _flatMap[_sIndex]['to_cid'].toString();
-        else
-          _sStopFlag = true;
-      } while (!_sStopFlag);
+        if (!flatMap[sIndex]['main']) {
+          sIndex = flatMap[sIndex]['to_cid'].toString();
+        } else {
+          sStopFlag = true;
+        }
+      } while (!sStopFlag);
 
       // get tCid currency list to main currency
-      let _tStopFlag = false;
+      let tStopFlag = false;
       do {
-        _tList.unshift(_tIndex);
-        _tTypeList.unshift(_flatMap[_tIndex]['type']);
-        _tRateList.unshift(1 / _flatMap[_tIndex]['rate']);
+        tList.unshift(tIndex);
+        tTypeList.unshift(flatMap[tIndex]['type']);
+        tRateList.unshift(1 / flatMap[tIndex]['rate']);
 
-        if (!_flatMap[_tIndex]['main'])
-          _tIndex = _flatMap[_tIndex]['to_cid'].toString();
-        else
-          _tStopFlag = true;
-
-      } while (!_tStopFlag);
+        if (!flatMap[tIndex]['main']) {
+          tIndex = flatMap[tIndex]['to_cid'].toString();
+        } else {
+          tStopFlag = true;
+        }
+      } while (!tStopFlag);
 
       // add main currency to list
-      if (_sIndex != _tIndex) {
-        let _sIndexOf = _mainCurrencyList.indexOf(_sIndex);
-        let _tIndexOf = _mainCurrencyList.indexOf(_tIndex);
+      if (sIndex !== tIndex) {
+        const sIndexOf = mainCurrencyList.indexOf(sIndex);
+        const tIndexOf = mainCurrencyList.indexOf(tIndex);
 
-        if (_sIndexOf < _tIndexOf) {
-          _mainCurrencyList.slice(_sIndexOf + 1, _tIndexOf).forEach(mCid => {
-            _sList.push(mCid);
-            _sTypeList.push(_flatMap[mCid]['type']);
-            _sRateList.push(1 / _flatMap[mCid]['rate']);
-          })
+        if (sIndexOf < tIndexOf) {
+          mainCurrencyList.slice(sIndexOf + 1, tIndexOf).forEach(mCid => {
+            sList.push(mCid);
+            sTypeList.push(flatMap[mCid]['type']);
+            sRateList.push(1 / flatMap[mCid]['rate']);
+          });
         } else {
-          _mainCurrencyList.slice(_tIndexOf + 1, _sIndexOf).forEach(mCid => {
-            _tList.unshift(mCid);
-            _tTypeList.unshift(_flatMap[mCid]['type']);
-            _tRateList.unshift(_flatMap[mCid]['rate']);
-          })
+          mainCurrencyList.slice(tIndexOf + 1, sIndexOf).forEach(mCid => {
+            tList.unshift(mCid);
+            tTypeList.unshift(flatMap[mCid]['type']);
+            tRateList.unshift(flatMap[mCid]['rate']);
+          });
         }
       }
 
       // initial _pList concat sList & tList
-      _pList = [..._sList, ..._tList];
-      _pTypeList = [..._sTypeList, ..._tTypeList];
-      _pRateList = [..._sRateList, ..._tRateList];
+      pList = [...sList, ...tList];
+      pTypeList = [...sTypeList, ...tTypeList];
+      pRateList = [...sRateList, ...tRateList];
 
       // remove duplicat path (precise rate path)
-      let _pListCkeckIndex = 0;
+      let pListCkeckIndex = 0;
       do {
-        let _pListReverse = [..._pList].reverse();
-        let _pListReverseCkeckIndex = (_pList.length - 1) - _pListReverse.indexOf(_pList[_pListCkeckIndex]);
+        const pListReverse = [...pList].reverse();
+        const pListReverseCkeckIndex = (pList.length - 1) - pListReverse.indexOf(pList[pListCkeckIndex]);
 
-        if (_pListReverseCkeckIndex - _pListCkeckIndex >= 1) {
-          _pRateList[_pListCkeckIndex] = 1;
-          _pRateList[_pListReverseCkeckIndex] = 1;
+        if (pListReverseCkeckIndex - pListCkeckIndex >= 1) {
+          pRateList[pListCkeckIndex] = 1;
+          pRateList[pListReverseCkeckIndex] = 1;
         }
 
-        if (_pListReverseCkeckIndex - _pListCkeckIndex > 1) {
-          let _spliceStart = _pListCkeckIndex + 1;
-          let _spliceNumber = _pListReverseCkeckIndex - _spliceStart;
-          _pList.splice(_spliceStart, _spliceNumber);
-          _pTypeList.splice(_spliceStart, _spliceNumber);
-          _pRateList.splice(_spliceStart, _spliceNumber);
+        if (pListReverseCkeckIndex - pListCkeckIndex > 1) {
+          const spliceStart = pListCkeckIndex + 1;
+          const spliceNumber = pListReverseCkeckIndex - spliceStart;
+          pList.splice(spliceStart, spliceNumber);
+          pTypeList.splice(spliceStart, spliceNumber);
+          pRateList.splice(spliceStart, spliceNumber);
         }
 
 
-        _pListCkeckIndex += 1;
-      } while (_pListCkeckIndex < _pList.length);
+        pListCkeckIndex += 1;
+      } while (pListCkeckIndex < pList.length);
 
 
       // initial list
-      _list = [..._pList];
-      _typeList = [..._pTypeList];
-      _rateList = [..._pRateList];
+      list = [...pList];
+      typeList = [...pTypeList];
+      rateList = [...pRateList];
 
       // remove duplicat type (short type rate path)
-      let _typeListCkeckIndex = 0;
+      let typeListCkeckIndex = 0;
       do {
-        let _typeListReverse = [..._typeList].reverse();
-        let _typeListReverseCkeckIndex = (_typeList.length - 1) - _typeListReverse.indexOf(_typeList[_typeListCkeckIndex]);
+        const typeListReverse = [...typeList].reverse();
+        const typeListReverseCkeckIndex = (typeList.length - 1) - typeListReverse.indexOf(typeList[typeListCkeckIndex]);
 
-        if (_typeListReverseCkeckIndex - _typeListCkeckIndex > 1) {
-          let _spliceStart = _typeListCkeckIndex + 1;
-          let _spliceNumber = _typeListReverseCkeckIndex - _spliceStart;
+        if (typeListReverseCkeckIndex - typeListCkeckIndex > 1) {
+          const spliceStart = typeListCkeckIndex + 1;
+          const spliceNumber = typeListReverseCkeckIndex - spliceStart;
 
-          _list.splice(_spliceStart, _spliceNumber);
-          _typeList.splice(_spliceStart, _spliceNumber);
-          _rateList.splice(_spliceStart, _spliceNumber);
-          _rateList[_typeListCkeckIndex] = 1;
-          _rateList[_typeListCkeckIndex + 1] = 1;
+          list.splice(spliceStart, spliceNumber);
+          typeList.splice(spliceStart, spliceNumber);
+          rateList.splice(spliceStart, spliceNumber);
+          rateList[typeListCkeckIndex] = 1;
+          rateList[typeListCkeckIndex + 1] = 1;
         }
-        _typeListCkeckIndex += 1;
-      } while (_typeListCkeckIndex < _typeList.length);
+        typeListCkeckIndex += 1;
+      } while (typeListCkeckIndex < typeList.length);
 
       // caculate the rate
-      _pRateList.forEach(r => {
-        _pRate = _pRate * r;
+      pRateList.forEach(r => {
+        pRate = pRate * r;
       });
-      _rateList.forEach(r => {
-        _rate = _rate * r;
+      rateList.forEach(r => {
+        rate = rate * r;
       });
 
-      // write sCid->tCid resualt the cache 
-      _currencyExchangeCache[_sCid] = _currencyExchangeCache[_sCid] || {};
-      _currencyExchangeCache[_sCid][_tCid] = {
-        rate: _rate,
-        track: _list,
-        precise_rate: _pRate,
-        precise_track: _pList,
-        fromType: _flatMap[_sCid]['type'],
-        toType: _flatMap[_tCid]['type']
-      }
+      // write sCid->tCid resualt the cache
+      currencyExchangeCache[sCid] = currencyExchangeCache[sCid] || {};
+      currencyExchangeCache[sCid][tCid] = {
+        rate: rate,
+        track: list,
+        precise_rate: pRate,
+        precise_track: pList,
+        fromType: flatMap[sCid]['type'],
+        toType: flatMap[tCid]['type']
+      };
 
-      // write tCid-> sCid resualt the cache 
-      _currencyExchangeCache[_tCid] = _currencyExchangeCache[_tCid] || {};
-      _currencyExchangeCache[_tCid][_sCid] = {
-        rate: 1 / _rate,
-        track: [..._list].reverse(),
-        precise_rate: 1 / _pRate,
-        precise_track: [..._pList].reverse(),
-        fromType: _flatMap[_tCid]['type'],
-        toType: _flatMap[_sCid]['type']
-      }
+      // write tCid-> sCid resualt the cache
+      currencyExchangeCache[tCid] = currencyExchangeCache[tCid] || {};
+      currencyExchangeCache[tCid][sCid] = {
+        rate: 1 / rate,
+        track: [...list].reverse(),
+        precise_rate: 1 / pRate,
+        precise_track: [...pList].reverse(),
+        fromType: flatMap[tCid]['type'],
+        toType: flatMap[sCid]['type']
+      };
     }
 
-    let _cObj = _currencyExchangeCache[_sCid][_tCid];
+    const cObj = currencyExchangeCache[sCid][tCid];
 
     return {
-      value: value * _cObj['rate'],
-      track: _cObj['track'],
-      precise_value: value * _cObj['precise_rate'],
-      precise_track: _cObj['precise_track'],
-      type: _cObj['toType']
+      value: value * cObj['rate'],
+      track: cObj['track'],
+      precise_value: value * cObj['precise_rate'],
+      precise_track: cObj['precise_track'],
+      type: cObj['toType']
     };
   }
 }

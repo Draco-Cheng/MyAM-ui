@@ -1,15 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { CurrencyService } from '../../../service/currency.service';
 
 function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
+  const d = new Date(date);
+  let month = '' + (d.getMonth() + 1);
+  let day = '' + d.getDate();
+  const year = d.getFullYear();
 
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
+  if (month.length < 2) {
+    month = '0' + month;
+  }
+
+  if (day.length < 2) {
+    day = '0' + day;
+  }
 
   return [year, month, day].join('-');
 }
@@ -24,7 +29,7 @@ function formatDate(date) {
   ]
 })
 
-export class CurrencyViewComponent {
+export class CurrencyViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
@@ -47,13 +52,13 @@ export class CurrencyViewComponent {
     private currencyService: CurrencyService
   ) {
     this.currencyList = this.currencyService.getCurrencyList();
-  };
+  }
 
   async ngOnInit() {
     await this.getCurrency();
     this.newCurrency['to_cid'] = this.getDefaultCid();
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['currencyMap']['legacy']) {
@@ -73,7 +78,7 @@ export class CurrencyViewComponent {
     this.__meta['currencyMap'] = await this.currencyService.getMap();
     this.currencyStructureMap = this.__meta['currencyMap']['data']['structureMap'];
     this.currencyFlatMap = this.__meta['currencyMap']['data']['flatMap'];
-  };
+  }
 
   getType(tid) {
     return this.currencyFlatMap[tid].type;
@@ -86,11 +91,11 @@ export class CurrencyViewComponent {
   getSelectionCallback(currency) {
     return cid => {
       currency.to_cid = cid;
-    }
+    };
   }
 
   async save(newCurrency) {
-    let _resault = await this.currencyService.add(newCurrency);
+    await this.currencyService.add(newCurrency);
 
     newCurrency.memo = '';
     newCurrency.type = '';

@@ -1,27 +1,25 @@
 import { Injectable } from '@angular/core';
 
-var callbackPool = {};
+const callbackPool = {};
 
 @Injectable() export class NotificationHandler {
-  constructor() {};
-
-
+  constructor() {}
 
   broadcast(type: string, msg: string) {
     const _keys = Object.keys(callbackPool);
 
-    console.info('[NotificationHandler] Broadcast to ' + _keys.length + ' clients, msg: [' + type + '] ' + msg);
+    console.log('[NotificationHandler] Broadcast to ' + _keys.length + ' clients, msg: [' + type + '] ' + msg);
 
     _keys.forEach(key => callbackPool[key](type, msg));
   }
 
   registCallback(callback: Function) {
-    const _t = Date.now();
-    callbackPool[_t] = callback;
-    return _t;
+    const time = Date.now();
+    callbackPool[time] = callback;
+    return time;
   }
 
   unregistCallback(id) {
-    delete callbackPool[id]
+    delete callbackPool[id];
   }
-};
+}

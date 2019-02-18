@@ -6,7 +6,7 @@ import { LoginForm } from './login.form';
 import { AuthService } from '../../service/auth.service';
 
 @Component({
-  selector: 'content-mid-center',
+  selector: 'app-content-mid-center',
   templateUrl: './login.template.html',
   styleUrls: ['./login.style.less'],
   providers: [AuthService]

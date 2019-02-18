@@ -9,8 +9,18 @@
         ],
         "component-selector": [
             true,
-            "element",
-            "app",
+            [
+                "element",
+                "attribute"
+            ],
+            [
+                "app",
+                "record",
+                "records",
+                "currency",
+                "type",
+                "admin"
+            ],
             "kebab-case"
         ]
     }

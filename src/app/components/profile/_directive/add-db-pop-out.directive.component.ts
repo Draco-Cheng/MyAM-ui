@@ -5,7 +5,7 @@ import { ProfileService } from '../../../service/profile.service';
 import { CurrencyService } from '../../../service/currency.service';
 
 @Component({
-  selector: '[add-db-pop-out]',
+  selector: '[app-add-db-pop-out]',
   templateUrl: './add-db-pop-out.template.html',
   styleUrls: ['./add-db-pop-out.style.less'],
   providers: [
@@ -29,22 +29,22 @@ export class AddDbPopOutDirectiveComponent {
   ) {
     this.currencyList = this.currencyService.getCurrencyList();
     this.currencyType = 'USD';
-  };
+  }
 
-  selectUploadFile(event){
+  selectUploadFile(event) {
     this.uploadFile = event.srcElement.files;
   }
 
   async createDB() {
-    if(this.showUploadBlock){
-      if(this.uploadFile){
+    if (this.showUploadBlock) {
+      if (this.uploadFile) {
         const _res = await this.profileService.uploadDB(this.dbName, this.uploadFile[0]);
 
-        this.callback(_res['success'] ? this.dbName : null);         
-      } 
+        this.callback(_res['success'] ? this.dbName : null);
+      }
     } else {
       await this.profileService.createDB(this.dbName, this.currencyType);
-      this.callback(this.dbName);      
+      this.callback(this.dbName);
     }
   }
 }

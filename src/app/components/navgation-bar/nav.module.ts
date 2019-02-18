@@ -7,8 +7,8 @@ import { NavComponent } from './nav.component';
 
 @NgModule({
   imports: [
-  	CommonModule,
-  	FormsModule
+    CommonModule,
+    FormsModule
   ],
   declarations: [
     NavComponent
@@ -16,4 +16,4 @@ import { NavComponent } from './nav.component';
   providers: [],
   exports: [NavComponent]
 })
-export class NavModule {}
+export class NavModule { }

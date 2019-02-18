@@ -13,210 +13,210 @@ import { CurrencyService } from './currency.service';
   constructor(
     private typeService: TypeService,
     private currencyService: CurrencyService
-  ) {};
+  ) { }
 
   async buildDaySummerize(records) {
-    let _records = records;
-    let _currencyService = this.currencyService;
-    let _defaultCid = _currencyService.getDefaultCid();
-    let _summerizeTemp = {};
-    let _daySummerize = [];
+    const currencyService = this.currencyService;
+    const defaultCid = currencyService.getDefaultCid();
+    const summerizeTemp = {};
+    const daySummerize = [];
 
-    _records.forEach(record => {
-      let _date = record['date'];
+    records.forEach(record => {
+      const date = record['date'];
 
-      let _dayRecord = _summerizeTemp[_date] = _summerizeTemp[_date] || { 'cost': 0, 'earn': 0, 'date': _date };
-      let _price = _currencyService.exchange(record['cid'], _defaultCid, record['value'])['value'];
-      _dayRecord[record['cashType'] == -1 ? 'cost' : 'earn'] += _price;
+      const dayRecord = summerizeTemp[date] = summerizeTemp[date] || { 'cost': 0, 'earn': 0, 'date': date };
+      const price = currencyService.exchange(record['cid'], defaultCid, record['value'])['value'];
+      dayRecord[record['cashType'] === -1 ? 'cost' : 'earn'] += price;
     });
 
-    Object.keys(_summerizeTemp)
+    Object.keys(summerizeTemp)
       .sort()
-      .forEach(date => _daySummerize.push(_summerizeTemp[date]));
+      .forEach(date => daySummerize.push(summerizeTemp[date]));
 
-    return _daySummerize;
+    return daySummerize;
   }
 
   async buildTypeSummerize(records) {
-    let _records = records;
-    let _typeService = this.typeService;
-    let _currencyService = this.currencyService;
-    let _defaultCid = _currencyService.getDefaultCid();
-    let _typeSummerize = {};
+    const typeService = this.typeService;
+    const currencyService = this.currencyService;
+    const defaultCid = currencyService.getDefaultCid();
+    const typeSummerize = {};
 
-    _typeSummerize['types'] = {};
-    _typeSummerize['typeNone'] = {};
-    _typeSummerize['total'] = {};
-    _typeSummerize['sum'] = {};
+    typeSummerize['types'] = {};
+    typeSummerize['typeNone'] = {};
+    typeSummerize['total'] = {};
+    typeSummerize['sum'] = {};
 
-    for (let _record of _records) {
-      let _parents = {};
-      for (let _tid of _record.tids) {
-        let _allRelateNode = await _typeService.getAllParentsInTree(_tid);
-        for (let _ptid of _allRelateNode) {
-          _parents[_ptid] = true;
+    for (const record of records) {
+      const parentTids = {};
+      for (const tid of record.tids) {
+        const allRelateNode = await typeService.getAllParentsInTree(tid);
+        for (const ptid of allRelateNode) {
+          parentTids[ptid] = true;
         }
 
-        _parents[_tid] = true;
+        parentTids[tid] = true;
       }
 
-      for (let _tid in _parents) {
-        if (!_typeSummerize['types'][_tid])
-          _typeSummerize['types'][_tid] = {};
+      Object.keys(parentTids)
+        .forEach(tid => {
+          if (!typeSummerize['types'][tid]) {
+            typeSummerize['types'][tid] = {};
+          }
 
-        if (!_typeSummerize['types'][_tid][_record.cid]) {
-          _typeSummerize['types'][_tid][_record.cid] = {
+          if (!typeSummerize['types'][tid][record.cid]) {
+            typeSummerize['types'][tid][record.cid] = {
+              count: 0,
+              priceCost: 0,
+              priceEarn: 0
+            };
+          }
+
+          const _tcItem = typeSummerize['types'][tid][record.cid];
+          _tcItem['count'] += 1;
+          _tcItem[record['cashType'] === -1 ? 'priceCost' : 'priceEarn'] += record['value'];
+        });
+
+      if (Object.keys(parentTids).length === 0) {
+        if (!typeSummerize['typeNone'][record.cid]) {
+          typeSummerize['typeNone'][record.cid] = {
             count: 0,
             priceCost: 0,
             priceEarn: 0
           };
         }
 
-        const _tcItem = _typeSummerize['types'][_tid][_record.cid];
-        _tcItem['count'] += 1;
-        _tcItem[_record['cashType'] == -1 ? 'priceCost' : 'priceEarn'] += _record['value'];
+        const ncItem = typeSummerize['typeNone'][record.cid];
+        ncItem['count'] += 1;
+        ncItem[record['cashType'] === -1 ? 'priceCost' : 'priceEarn'] += record['value'];
       }
 
-      if (Object.keys(_parents).length == 0) {
-        if (!_typeSummerize['typeNone'][_record.cid]) {
-          _typeSummerize['typeNone'][_record.cid] = {
-            count: 0,
-            priceCost: 0,
-            priceEarn: 0
-          };
-        }
-
-        const _ncItem = _typeSummerize['typeNone'][_record.cid];
-        _ncItem['count'] += 1;
-        _ncItem[_record['cashType'] == -1 ? 'priceCost' : 'priceEarn'] += _record['value'];
-      }
-
-      if (!_typeSummerize['total'][_record.cid]) {
-        _typeSummerize['total'][_record.cid] = {
+      if (!typeSummerize['total'][record.cid]) {
+        typeSummerize['total'][record.cid] = {
           count: 0,
           priceCost: 0,
           priceEarn: 0
+        };
+      }
+
+      const cItem = typeSummerize['total'][record.cid];
+      cItem['count'] += 1;
+      cItem[record['cashType'] === -1 ? 'priceCost' : 'priceEarn'] += record['value'];
+
+    }
+
+    let sumCost = 0;
+    let sumEarn = 0;
+    let sumCount = 0;
+
+    Object.keys(typeSummerize['total'])
+      .forEach(cid => {
+        if (cid === defaultCid) {
+          sumCost += typeSummerize['total'][cid]['priceCost'];
+          sumEarn += typeSummerize['total'][cid]['priceEarn'];
+        } else {
+          sumCost += currencyService.exchange(cid, defaultCid, typeSummerize['total'][cid]['priceCost'])['value'];
+          sumEarn += currencyService.exchange(cid, defaultCid, typeSummerize['total'][cid]['priceEarn'])['value'];
         }
-      }
+        sumCount += typeSummerize['total'][cid]['count'];
+      });
 
-      const _cItem = _typeSummerize['total'][_record.cid];
-      _cItem['count'] += 1;
-      _cItem[_record['cashType'] == -1 ? 'priceCost' : 'priceEarn'] += _record['value'];
+    typeSummerize['sum']['priceCost'] = sumCost;
+    typeSummerize['sum']['priceEarn'] = sumEarn;
+    typeSummerize['sum']['sum'] = sumEarn - sumCost;
+    typeSummerize['sum']['count'] = sumCount;
 
-    }
-
-    let _sumCost = 0;
-    let _sumEarn = 0;
-    let _sumCount = 0;
-    for (let _cid in _typeSummerize['total']) {
-      if (_cid == _defaultCid) {
-        _sumCost += _typeSummerize['total'][_cid]['priceCost'];
-        _sumEarn += _typeSummerize['total'][_cid]['priceEarn'];
-      } else {
-        _sumCost += _currencyService.exchange(_cid, _defaultCid, _typeSummerize['total'][_cid]['priceCost'])['value'];
-        _sumEarn += _currencyService.exchange(_cid, _defaultCid, _typeSummerize['total'][_cid]['priceEarn'])['value'];
-      }
-
-      _sumCount += _typeSummerize['total'][_cid]['count'];
-
-    }
-    _typeSummerize['sum']['priceCost'] = _sumCost;
-    _typeSummerize['sum']['priceEarn'] = _sumEarn;
-    _typeSummerize['sum']['sum'] = _sumEarn - _sumCost;
-    _typeSummerize['sum']['count'] = _sumCount;
-
-    return _typeSummerize;
+    return typeSummerize;
   }
 
 
-  async typeSummerizeToPieChart(typeSummerize, typelist, unclassifiedTypeList, showTypeNone ? ) {
-    let _ngxChartData = [];
+  async typeSummerizeToPieChart(typeSummerize, typelist, unclassifiedTypeList, showTypeNone?) {
+    const ngxChartData = [];
 
     for (let i = 0; i < typelist.length; i++) {
+      const tid = typelist[i];
+      let costSum = 0;
+      let earnSum = 0;
 
-      let _tid = typelist[i];
-      let _costSum = 0;
-      let _earnSum = 0;
+      Object.keys(typeSummerize['types'][tid])
+        .forEach(cid => {
+          const typeSumRecord = typeSummerize['types'][tid][cid];
+          costSum += this.currencyService.exchange(cid, null, typeSumRecord['priceCost'])['value'];
+          earnSum += this.currencyService.exchange(cid, null, typeSumRecord['priceEarn'])['value'];
+        });
 
-      for (let _cid in typeSummerize['types'][_tid]) {
-        let _typeSumRecord = typeSummerize['types'][_tid][_cid];
-        _costSum += this.currencyService.exchange(_cid, null, _typeSumRecord['priceCost'])['value'];
-        _earnSum += this.currencyService.exchange(_cid, null, _typeSumRecord['priceEarn'])['value'];
-      }
-
-      if (_costSum || _earnSum) {
-        const _tidLabel = await this.typeService.tidToLable(_tid);
-
-        _costSum && _ngxChartData.push({ 'name': `[C] ${_tidLabel}`, 'value': _costSum });
-        _earnSum && _ngxChartData.push({ 'name': `[E] ${_tidLabel}`, 'value': _earnSum });
+      if (costSum || earnSum) {
+        const tidLabel = await this.typeService.tidToLable(tid);
+        costSum && ngxChartData.push({ 'name': `[C] ${tidLabel}`, 'value': costSum });
+        earnSum && ngxChartData.push({ 'name': `[E] ${tidLabel}`, 'value': earnSum });
       }
     }
 
     if (unclassifiedTypeList) {
       for (let i = 0; i < unclassifiedTypeList.length; i++) {
+        const tid = unclassifiedTypeList[i];
+        let costSum = 0;
+        let earnSum = 0;
+        Object.keys(typeSummerize['types'][tid])
+          .forEach(cid => {
+            const typeSumRecord = typeSummerize['types'][tid][cid];
+            costSum += this.currencyService.exchange(cid, null, typeSumRecord['priceCost'])['value'];
+            earnSum += this.currencyService.exchange(cid, null, typeSumRecord['priceEarn'])['value'];
+          });
 
-        let _tid = unclassifiedTypeList[i];
-        let _costSum = 0;
-        let _earnSum = 0;
-
-        for (let _cid in typeSummerize['types'][_tid]) {
-          let _typeSumRecord = typeSummerize['types'][_tid][_cid];
-          _costSum += this.currencyService.exchange(_cid, null, _typeSumRecord['priceCost'])['value'];
-          _earnSum += this.currencyService.exchange(_cid, null, _typeSumRecord['priceEarn'])['value'];
-        }
-
-        if (_costSum || _earnSum) {
-          const _tidLabel = 'Unclassified Types';
-          _costSum && _ngxChartData.push({ 'name': `[C] ${_tidLabel}`, 'value': _costSum });
-          _earnSum && _ngxChartData.push({ 'name': `[E] ${_tidLabel}`, 'value': _earnSum });
+        if (costSum || earnSum) {
+          const tidLabel = 'Unclassified Types';
+          costSum && ngxChartData.push({ 'name': `[C] ${tidLabel}`, 'value': costSum });
+          earnSum && ngxChartData.push({ 'name': `[E] ${tidLabel}`, 'value': earnSum });
         }
       }
     }
 
     if (showTypeNone && typeSummerize['typeNone']) {
-      let _typeNoneSum = typeSummerize['typeNone'];
-      let _typeNoneCostSum = 0;
-      let _typeNoneEarnSum = 0;
+      const typeNoneSum = typeSummerize['typeNone'];
+      let typeNoneCostSum = 0;
+      let typeNoneEarnSum = 0;
 
-      for (let _cid in _typeNoneSum) {
-        let _typeNoneSumRecord = _typeNoneSum[_cid];
-        _typeNoneCostSum += this.currencyService.exchange(_cid, null, _typeNoneSumRecord['priceCost'])['value'];
-        _typeNoneEarnSum += this.currencyService.exchange(_cid, null, _typeNoneSumRecord['priceEarn'])['value'];
-      }
+      Object.keys(typeNoneSum)
+        .forEach(cid => {
+          const typeNoneSumRecord = typeNoneSum[cid];
+          typeNoneCostSum += this.currencyService.exchange(cid, null, typeNoneSumRecord['priceCost'])['value'];
+          typeNoneEarnSum += this.currencyService.exchange(cid, null, typeNoneSumRecord['priceEarn'])['value'];
+        });
 
-      if (_typeNoneCostSum || _typeNoneEarnSum) {
-        const _tidLabel = 'No Type Records';
-        _typeNoneCostSum && _ngxChartData.push({ 'name': `[C] ${_tidLabel}`, 'value': _typeNoneCostSum });
-        _typeNoneEarnSum && _ngxChartData.push({ 'name': `[E] ${_tidLabel}`, 'value': _typeNoneEarnSum });
+      if (typeNoneCostSum || typeNoneEarnSum) {
+        const tidLabel = 'No Type Records';
+        typeNoneCostSum && ngxChartData.push({ 'name': `[C] ${tidLabel}`, 'value': typeNoneCostSum });
+        typeNoneEarnSum && ngxChartData.push({ 'name': `[E] ${tidLabel}`, 'value': typeNoneEarnSum });
       }
 
     }
 
-    return _ngxChartData;
+    return ngxChartData;
   }
 
   async daySummerizeToLineChart(daySummerize) {
-    let _ngxChartData = {};
+    const ngxChartData = {};
 
     ['Cost', 'Earn', 'Sum'].forEach(valeType => {
-      _ngxChartData[valeType] = {
+      ngxChartData[valeType] = {
         'name': valeType,
         'series': []
       };
     });
 
-    let _valueCost = 0;
-    let _valueEarn = 0;
+    let valueCost = 0;
+    let valueEarn = 0;
 
     daySummerize.forEach(dayRecord => {
-      _valueCost += dayRecord['cost'] || 0;
-      _valueEarn += dayRecord['earn'] || 0;
+      valueCost += dayRecord['cost'] || 0;
+      valueEarn += dayRecord['earn'] || 0;
 
-      _ngxChartData['Cost']['series'].push({ name: dayRecord['date'], value: _valueCost });
-      _ngxChartData['Earn']['series'].push({ name: dayRecord['date'], value: _valueEarn });
-      _ngxChartData['Sum']['series'].push({ name: dayRecord['date'], value: _valueEarn - _valueCost });
+      ngxChartData['Cost']['series'].push({ name: dayRecord['date'], value: valueCost });
+      ngxChartData['Earn']['series'].push({ name: dayRecord['date'], value: valueEarn });
+      ngxChartData['Sum']['series'].push({ name: dayRecord['date'], value: valueEarn - valueCost });
     });
 
-    return _ngxChartData;
+    return ngxChartData;
   }
 }

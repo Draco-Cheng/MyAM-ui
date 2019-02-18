@@ -8,25 +8,25 @@ import { Component, Input } from '@angular/core';
 })
 
 export class CurrencyMapDirectiveComponent {
-  //*************************************
+  // *************************************
   // Note for who want to use this module
-  //-------------------------------------
+  // -------------------------------------
   // neceesary input
   @Input() callback: Function;
-  @Input() currencyStructureMap ? : Object;
-  @Input() currencyFlatMap ? : Object;
-  //*************************************
+  @Input() currencyStructureMap?: Object;
+  @Input() currencyFlatMap?: Object;
+  @Input() inputCid?: any;
+  // *************************************
   // optional input
-  @Input() inputCid ? : any;
-  //*************************************
+  // *************************************
   // internal input
-  @Input() currentNode ? : any;
-  //*************************************
+  @Input() currentNode?: any;
+  // *************************************
 
-  constructor() {};
+  constructor() { }
 
   select() {
-    if (this.currentNode.cid != this.inputCid) {
+    if (this.currentNode.cid !== this.inputCid) {
       this.callback(this.currentNode.cid);
       this.inputCid = this.currentNode.cid;
     }
@@ -34,7 +34,7 @@ export class CurrencyMapDirectiveComponent {
 
   objKeys(obj) {
     return Object.keys(obj);
-  };
+  }
 
   getType(tid) {
     return this.currencyFlatMap[tid].type;

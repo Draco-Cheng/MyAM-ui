@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
@@ -16,7 +16,7 @@ import { CurrencyService } from '../../../service/currency.service';
 })
 
 
-export class RecordTableDirectiveComponent {
+export class RecordTableDirectiveComponent implements OnInit {
   @Input() records: any;
 
   public __isInit = false;
@@ -33,21 +33,20 @@ export class RecordTableDirectiveComponent {
     private recordsService: RecordsService,
     private typeService: TypeService,
     private currencyService: CurrencyService
-  ) {};
+  ) { }
 
   async ngOnInit() {
     await this.getTypes();
     await this.getCurrency();
     this.__isInit = true;
   }
-  
-  async __checkDataUpToDate(){
-    if(this.__meta['types']['legacy']){
+  async __checkDataUpToDate() {
+    if (this.__meta['types']['legacy']) {
       await this.getTypes();
     }
   }
 
-  async getCurrency(){
+  async getCurrency() {
     // only check currency on initial ready
     const _currencyMap = await this.currencyService.getMap();
     this.currencyFlatMap = _currencyMap['data']['flatMap'];
@@ -62,16 +61,17 @@ export class RecordTableDirectiveComponent {
     this.types.forEach(element => {
       this.typesFlat[element.tid] = element;
     });
-  };
+  }
 
   ObjKey(obj) {
     return Object.keys(obj);
   }
 
   tidToLabel(tid: string) {
-    if(this.typesFlat[tid])
+    if (this.typesFlat[tid]) {
       return this.typesFlat[tid].type_label;
-    
+    }
+
     console.warn('Type missing', tid);
     return tid;
   }
@@ -90,14 +90,14 @@ export class RecordTableDirectiveComponent {
   }
 
   getRecordTypeMapSwitch(record) {
-    let _self = this;
+    const self = this;
     return (tid) => {
-      if (record.tidsObjMap[tid])
+      if (record.tidsObjMap[tid]) {
         delete record.tidsObjMap[tid];
-      else
+      } else {
         record.tidsObjMap[tid] = true;
-
-      _self.recordChange(record);
+      }
+      self.recordChange(record);
     };
   }
 
@@ -105,7 +105,7 @@ export class RecordTableDirectiveComponent {
     return cid => {
       record.cid = cid;
       this.recordChange(record);
-    }
+    };
   }
 
   async saveRecord(record) {
@@ -113,8 +113,9 @@ export class RecordTableDirectiveComponent {
     const _resault1 = await this.recordsService.set(record);
     const _resault2 = await this.recordsService.setType(record.rid, Object.keys(record.tidsObjMap));
 
-    if (_resault1['data'] && _resault2['data'])
+    if (_resault1['data'] && _resault2['data']) {
       record.isChange = false;
+    }
   }
 
   async delRecord(record) {
@@ -140,9 +141,11 @@ export class RecordTableDirectiveComponent {
     record.currencyExhange = this.currencyService.exchange(record.cid, this.defaultCid, record.value);
     return true;
   }
-  
+
   roundPrice(num) {
-    if(num == 0) return 0;
+    if (num === 0) {
+      return 0;
+    }
     return Math.round(num * 100) / 100 || 0.01;
   }
 }

@@ -15,12 +15,11 @@ import { TypeMapFragmentDirectiveComponent } from './type-map-fragment.directive
     TypeMapPanelPopOutDirectiveComponent,
     TypeMapPanelDirectiveComponent,
     TypeMapFragmentDirectiveComponent
-    
   ],
   providers: [],
   exports: [
     TypeMapPanelPopOutDirectiveComponent,
-    TypeMapPanelDirectiveComponent    
+    TypeMapPanelDirectiveComponent
   ]
 })
-export class TypeMapPanelDirectiveModule {}
+export class TypeMapPanelDirectiveModule { }

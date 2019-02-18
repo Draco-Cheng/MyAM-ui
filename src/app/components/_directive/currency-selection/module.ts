@@ -11,10 +11,10 @@ import { CurrencySelectionDirectiveComponent } from './currency-selection.direct
 @NgModule({
   imports: [CommonModule, FormsModule],
   declarations: [
-	  CurrencyMapDirectiveComponent,
-	  CurrencySelectionDirectiveComponent
+    CurrencyMapDirectiveComponent,
+    CurrencySelectionDirectiveComponent
   ],
   providers: [],
   exports: [CurrencyMapDirectiveComponent, CurrencySelectionDirectiveComponent]
 })
-export class CurrencySelectionDirectiveModule {}
+export class CurrencySelectionDirectiveModule { }

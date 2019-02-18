@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
@@ -11,7 +11,7 @@ import { TypeService } from '../../../service/type.service';
   ]
 })
 
-export class TypesViewComponent {
+export class TypesViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
@@ -32,13 +32,13 @@ export class TypesViewComponent {
 
   constructor(
     private typeService: TypeService
-  ) {};
+  ) { }
 
   async ngOnInit() {
     await this.getTypes();
     await this.getTypesFlatMap();
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['types']['legacy']) {
@@ -48,7 +48,7 @@ export class TypesViewComponent {
     if (this.__meta['typesMapFlat']['legacy']) {
       await this.getTypesFlatMap();
     }
-  };
+  }
 
   async getTypes() {
     this.__meta['types'] = await this.typeService.get();
@@ -56,12 +56,12 @@ export class TypesViewComponent {
     this.types.forEach(element => {
       this.typesFlat[element.tid] = element;
     });
-  };
+  }
 
   async getTypesFlatMap() {
     this.__meta['typesMapFlat'] = await this.typeService.getFlatMap();
     this.typesMapFlatMeta = this.__meta['typesMapFlat'];
-  };
+  }
 
   getParents() {
     return Object.keys(this.newType.parents);
@@ -72,19 +72,19 @@ export class TypesViewComponent {
   }
 
   getTypeMapCallback() {
-    const _self = this;
-    const _newTypeParents = _self.newType.parents;
+    const self = this;
+    const newTypeParents = self.newType.parents;
 
     return async tid => {
-      if (!tid)
-        return _self.showParentSelectPopOut = false;
-
-      if (_newTypeParents.hasOwnProperty(tid)) {
-        delete _self.newType.parents[tid];
-      } else {
-        _self.newType.parents[tid] = true;
+      if (!tid) {
+        return self.showParentSelectPopOut = false;
       }
-    }
+      if (newTypeParents.hasOwnProperty(tid)) {
+        delete self.newType.parents[tid];
+      } else {
+        self.newType.parents[tid] = true;
+      }
+    };
   }
 
   async add(node) {

@@ -5,10 +5,6 @@ import { RequestHandler } from '../handler/request.handler';
 import { CryptHandler } from '../handler/crypt.handler';
 import { NotificationHandler } from '../handler/notification.handler';
 
-function cloneObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-};
-
 @Injectable() export class AdminServer {
   private endpoint = '/admin';
   private encrypt;
@@ -20,37 +16,39 @@ function cloneObj(obj) {
     private notificationHandler: NotificationHandler
   ) {
     this.encrypt = cryptHandler.encrypt;
-  };
+  }
 
   async getUserList() {
 
-    const _url = this.endpoint + '/userList';
-    const _data = {};
+    const url = this.endpoint + '/userList';
+    const data = {};
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-
-    return _resault;
-  }
-
-  async setUser(formObj){
-    const _url = this.endpoint + '/setUser';
-    const _data = formObj;
-
-    if(_data['newPwd']) {
-      _data['token'] = this.encrypt(_data['newPwd']);
-      delete _data['newPwd'];
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
     }
 
-    const _resault = await this.request.post(_url, _data);
+    return resault;
+  }
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-    else
+  async setUser(formObj) {
+    const url = this.endpoint + '/setUser';
+    const data = formObj;
+
+    if (data['newPwd']) {
+      data['token'] = this.encrypt(data['newPwd']);
+      delete data['newPwd'];
+    }
+
+    const resault = await this.request.post(url, data);
+
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    } else {
       this.notificationHandler.broadcast('success', 'Update success!');
+    }
 
-    return _resault;
+    return resault;
   }
 }

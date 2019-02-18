@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { ProfileService } from '../../service/profile.service';
 import { AuthService } from '../../service/auth.service';
 
 @Component({
-  selector: 'navView',
+  selector: 'app-nav',
   templateUrl: './nav.template.html',
   styleUrls: ['./nav.style.less'],
   providers: [
@@ -12,7 +12,7 @@ import { AuthService } from '../../service/auth.service';
     AuthService
   ]
 })
-export class NavComponent {
+export class NavComponent implements OnInit {
   private name = 'MyAM';
   private __meta = {};
   public __isInit;
@@ -29,7 +29,7 @@ export class NavComponent {
   async ngOnInit() {
     this.getConfig();
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['config']['legacy']) {
@@ -38,10 +38,10 @@ export class NavComponent {
   }
 
   getConfig() {
-    var _config = this.__meta['config'] = this.profileService.getConfig();
-    this.user = _config['user'];
-    this.isLogin = _config['isLogin'];
-    this.database = _config['database'];
+    const config = this.__meta['config'] = this.profileService.getConfig();
+    this.user = config['user'];
+    this.isLogin = config['isLogin'];
+    this.database = config['database'];
   }
 
   async logout() {

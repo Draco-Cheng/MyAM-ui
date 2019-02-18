@@ -1,4 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import * as _ from 'lodash';
 
 import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
@@ -6,30 +7,30 @@ import { CurrencyService } from '../../../service/currency.service';
 import { SummarizeService } from '../../../service/summarize.service';
 
 function formatDate(date) {
-  var d = new Date(date),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
+  const d = new Date(date);
+  let month = '' + (d.getMonth() + 1);
+  let day = '' + d.getDate();
+  const year = d.getFullYear();
 
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
+  if (month.length < 2) { month = '0' + month; }
+  if (day.length < 2) { day = '0' + day; }
 
   return [year, month, day].join('-');
 }
 
 // For performance issue move scroll binding out of component
+// TODO: find a better solution for scrolling issue. Maybe try slick grid or angular material?
 let __componentThis;
 
 function onScroll(evt) {
-  if (!__componentThis) return;
-  if (__componentThis.records_pool.length <= __componentThis.records_index || __componentThis.records_index >= 500)
-    return;
+  if (!__componentThis) { return; }
+  if (__componentThis.records_pool.length <= __componentThis.records_index || __componentThis.records_index >= 500) { return; }
 
   const _target = evt['target']['scrollingElement'];
   if (_target.scrollHeight - (_target.scrollTop + window.innerHeight) <= 1) {
     __componentThis.showMoreBtn.nativeElement.click();
   }
-};
+}
 window.onscroll = onScroll;
 
 @Component({
@@ -50,7 +51,7 @@ window.onscroll = onScroll;
   */
 })
 
-export class RecordsViewComponent {
+export class RecordsViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
@@ -89,15 +90,13 @@ export class RecordsViewComponent {
     private recordsService: RecordsService,
     private typeService: TypeService,
     private summarizeService: SummarizeService
-  ) { };
+  ) { }
 
   async ngOnInit() {
     await this.getRecord();
-
     __componentThis = this;
-
     this.__isInit = true;
-  };
+  }
 
   async getRecord() {
     this.__meta['records'] = await this.recordsService.get(this.qureyCondition);
@@ -107,7 +106,7 @@ export class RecordsViewComponent {
     this.lazyPushRecords();
 
     await this.buildSummarize();
-  };
+  }
 
   async buildSummarize() {
     this.typeSummerize = await this.summarizeService.buildTypeSummerize(this.records_pool);
@@ -121,18 +120,16 @@ export class RecordsViewComponent {
   lazyPushRecords() {
     this.records.push(...(this.records_pool.slice(this.records_index, this.records_index + this.records_push_number)));
     this.records_index = this.records_index + this.records_push_number;
-  };
+  }
 
   getSelectionCallback = cid => {
     this.qureyCondition.cid = cid;
   }
 
   getQureyConditionTidsArr() {
-    let _arr = [];
-    for (let key in this.qureyConditionTidsObj) {
-      _arr.push({ tid: key, label: this.qureyConditionTidsObj[key] })
-    }
-    return _arr;
+    return _.map(this.qureyConditionTidsObj, (val, key) => {
+      return { tid: key, label: val };
+    });
   }
 
   conditionChange() {
@@ -143,18 +140,16 @@ export class RecordsViewComponent {
   }
 
   async buildQureyConditionTidsArr() {
-    let _tidsList = Object.keys(this.qureyConditionTidsObj);
-    let _arr = [];
+    const tidsList = Object.keys(this.qureyConditionTidsObj);
+    const arr = [];
 
-    for (let i = 0; i < _tidsList.length; i++) {
-      let _list = await this.typeService.getAllChildsInTree(_tidsList[i]);
-
-      _list.length || _list.push(_tidsList[i]);
-
-      _arr.push(_list);
+    for (let i = 0; i < tidsList.length; i++) {
+      const list = await this.typeService.getAllChildsInTree(tidsList[i]);
+      list.length || list.push(tidsList[i]);
+      arr.push(list);
     }
 
-    this.qureyCondition['tids_json'] = _arr.length ? JSON.stringify(_arr) : null;
+    this.qureyCondition['tids_json'] = arr.length ? JSON.stringify(arr) : null;
   }
 
   typeMapCallback = async (tid, label) => {
@@ -164,10 +159,11 @@ export class RecordsViewComponent {
       return;
     }
 
-    if (this.qureyConditionTidsObj[tid])
+    if (this.qureyConditionTidsObj[tid]) {
       delete this.qureyConditionTidsObj[tid];
-    else
+    } else {
       this.qureyConditionTidsObj[tid] = label;
+    }
   }
 
   removeQureyConditionTids(tid) {

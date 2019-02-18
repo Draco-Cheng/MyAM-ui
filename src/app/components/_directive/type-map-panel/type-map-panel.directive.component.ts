@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, ElementRef, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
@@ -10,17 +10,15 @@ import { TypeService } from '../../../service/type.service';
 
 })
 
-export class TypeMapPanelDirectiveComponent {
-  //*************************************
+export class TypeMapPanelDirectiveComponent implements OnInit {
+  // *************************************
   // Note for who want to use this module
-  //-------------------------------------
+  // -------------------------------------
   // neceesary input
   @Input() selectedTids: Object;
-  @Input() disabledTids ? : Object;
+  @Input() disabledTids?: Object;
   @Input() callback: Function;
-  //*************************************
-  // optional input
-  //*************************************
+  // *************************************
 
   public __isInit = false;
   private __meta = {};
@@ -32,13 +30,13 @@ export class TypeMapPanelDirectiveComponent {
   constructor(
     private typeService: TypeService,
     private elementRef: ElementRef
-  ) {};
+  ) { }
 
   async ngOnInit() {
     await this.getTypes();
     await this.getTypesFlatMap();
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['types']['legacy']) {
@@ -55,11 +53,10 @@ export class TypeMapPanelDirectiveComponent {
     this.types.forEach(element => {
       this.typesFlat[element.tid] = element;
     });
-  };
+  }
 
   async getTypesFlatMap() {
     this.__meta['typesMapFlat'] = await this.typeService.getFlatMap();
     this.typesMapFlatMeta = this.__meta['typesMapFlat'];
-  };
-
+  }
 }

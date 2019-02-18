@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 
 import defaultConf from '../config.json';
 
-var config = defaultConf;
+let config = defaultConf;
 
 function cloneObj(obj) {
   return JSON.parse(JSON.stringify(obj));
-};
-
+}
 
 @Injectable() export class ConfigHandler {
 
@@ -16,11 +15,11 @@ function cloneObj(obj) {
   }
 
   set(name, data) {
-    let _newConfig = cloneObj(config);
-    _newConfig[name] = typeof data == 'object' ? cloneObj(data) : data;
+    const newConfig = cloneObj(config);
+    newConfig[name] = typeof data === 'object' ? cloneObj(data) : data;
 
     config['legacy'] = true;
-    config = _newConfig;
+    config = newConfig;
   }
 
   setUserProfile(userProfile) {
@@ -28,19 +27,18 @@ function cloneObj(obj) {
     this.set('uid', userProfile['uid']);
     this.set('isLogin', true);
 
-    let _uid = userProfile['uid'];
-    let _dbList = userProfile['dbList'];
+    const uid = userProfile['uid'];
+    const dbList = userProfile['dbList'];
 
-    if (_dbList.length) {
-      let _localSaveDB = localStorage.getItem(_uid + '.db');
+    if (dbList.length) {
+      const localSaveDB = localStorage.getItem(uid + '.db');
 
-      if (_localSaveDB && _dbList.indexOf(_localSaveDB) != -1) {
-        this.set('database', _localSaveDB);
+      if (localSaveDB && dbList.indexOf(localSaveDB) !== -1) {
+        this.set('database', localSaveDB);
       } else {
-        this.set('database', _dbList[0]);
-        localStorage.setItem(_uid + '.db', _dbList[0]);
+        this.set('database', dbList[0]);
+        localStorage.setItem(uid + '.db', dbList[0]);
       }
     }
   }
-
-};
+}

@@ -1,4 +1,4 @@
-import { Component, Input, Output } from '@angular/core';
+import { Component, Input, Output, OnInit } from '@angular/core';
 
 import { RecordsService } from '../../../service/records.service';
 import { SummarizeService } from '../../../service/summarize.service';
@@ -15,7 +15,7 @@ import { NgxLineChartConf } from './ngx-line-chart-conf';
   ]
 })
 
-export class RecordSummarizeLineChartDirectiveComponent {
+export class RecordSummarizeLineChartDirectiveComponent implements OnInit {
   @Input() getDaySummerize: Function;
 
   public __isInit = false;
@@ -28,9 +28,9 @@ export class RecordSummarizeLineChartDirectiveComponent {
 
   constructor(
     private summarizeService: SummarizeService,
-  ) {};
+  ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.buildSummerize();
     this.__isInit = true;
   }
@@ -40,26 +40,26 @@ export class RecordSummarizeLineChartDirectiveComponent {
 
     this.daySummerize = this.getDaySummerize();
     await this.buildLineChartData(this.daySummerize);
-  };
+  }
 
   async buildLineChartData(summerize) {
-    const _summerize = summerize || this.daySummerize;
-    this.summerizeForLineChartObj = await this.summarizeService.daySummerizeToLineChart(_summerize);
+    summerize = summerize || this.daySummerize;
+    this.summerizeForLineChartObj = await this.summarizeService.daySummerizeToLineChart(summerize);
     this.renderLineChart();
-  };
+  }
 
   renderLineChart() {
     switch (this.lineChartSelected) {
-      case "":
+      case '':
         this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj['Cost'], this.summerizeForLineChartObj['Earn']]);
         break;
-      case "SUM":
+      case 'SUM':
         this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj['Sum']]);
         break;
     }
-  };
+  }
 
   onSelect() {
     this.renderLineChart();
-  };
+  }
 }

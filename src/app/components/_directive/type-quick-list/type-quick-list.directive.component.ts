@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
@@ -9,17 +9,17 @@ import { TypeService } from '../../../service/type.service';
   providers: [TypeService]
 })
 
-export class TypeQuickListDirectiveComponent {
-  //*************************************
+export class TypeQuickListDirectiveComponent implements OnInit {
+  // *************************************
   // Note for who want to use this module
-  //-------------------------------------
+  // -------------------------------------
   // neceesary input
   @Input() selectedTids: Object;
   @Input() callback: Function;
-  //*************************************
+  // *************************************
   // optional input
-  @Input() inputCid ? : String;
-  //*************************************
+  @Input() inputCid?: String;
+  // *************************************
 
   public __isInit = false;
   private __meta = {};
@@ -29,12 +29,12 @@ export class TypeQuickListDirectiveComponent {
 
   constructor(
     private typeService: TypeService,
-  ) {};
+  ) { }
 
   async ngOnInit() {
     await this.getTypes();
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['types']['legacy']) {
@@ -46,7 +46,7 @@ export class TypeQuickListDirectiveComponent {
     this.__meta['types'] = await this.typeService.get();
     this.types = this.__meta['types']['data'];
     this.typeQuickList = this.types.filter(type => type.quickSelect);
-  };
+  }
 
   isCheck(type) {
 

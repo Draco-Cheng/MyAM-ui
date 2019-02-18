@@ -1,13 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+import * as _ from 'lodash';
 
 import { ProfileService } from '../../../service/profile.service';
 
-function cloneObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-};
-
 @Component({
-  selector: 'profile-content',
+  selector: 'app-profile-content',
   templateUrl: './profile.view.template.html',
   styleUrls: ['./profile.view.style.less'],
   providers: [
@@ -15,7 +13,7 @@ function cloneObj(obj) {
   ]
 })
 
-export class ProfileViewComponent {
+export class ProfileViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
@@ -37,8 +35,7 @@ export class ProfileViewComponent {
     private profileService: ProfileService
   ) {
     this.profileMap = this.profileService.getProfileMap();
-  };
-
+  }
 
   async ngOnInit() {
     this.getConfig();
@@ -52,7 +49,7 @@ export class ProfileViewComponent {
     }
 
     this.__isInit = true;
-  };
+  }
 
   async __checkDataUpToDate() {
     if (this.__meta['config']['legacy']) {
@@ -62,9 +59,9 @@ export class ProfileViewComponent {
 
   getConfig() {
     this.__meta['config'] = this.profileService.getConfig();
-    const _config = cloneObj(this.__meta['config']);
-    this.user = _config['user'];
-    this.activedDb = _config['database'];
+    const config = _.cloneDeep(this.__meta['config']);
+    this.user = config['user'];
+    this.activedDb = config['database'];
   }
 
   formatDate(date) {
@@ -82,22 +79,22 @@ export class ProfileViewComponent {
 
   async getBreakpointDbList() {
     if (this.selectedDb) {
-      var _res = await this.profileService.getBreakpointDbList(this.selectedDb);
-      let _list = < any[] > _res['data'];
+      const res = await this.profileService.getBreakpointDbList(this.selectedDb);
+      const list = < any[] > res['data'];
       this.breakpointDbList = [];
 
-      _list.forEach(name => this.breakpointDbList.push({ 'dbName': name }));
+      list.forEach(name => this.breakpointDbList.push({ 'dbName': name }));
     }
   }
 
   async delDB(dbName) {
-    let _msg = `Are you sure, you want to delete database: ${dbName}?\nPlease Enter: "${dbName}" to confirm!`;
-    if (prompt(_msg) == dbName) {
+    const msg = `Are you sure, you want to delete database: ${dbName}?\nPlease Enter: "${dbName}" to confirm!`;
+    if (prompt(msg) === dbName) {
       await this.profileService.delDB(dbName);
 
       this.setSelectDb();
       this.getBreakpointDbList();
-      if (dbName == this.activedDb) {
+      if (dbName === this.activedDb) {
         this.setActiveDb();
       }
     }
@@ -105,7 +102,7 @@ export class ProfileViewComponent {
 
   async delBreakpointDb(breakpointDb) {
     if (this.selectedDb) {
-      var _res = await this.profileService.delBreakpointDb(this.selectedDb, breakpointDb);
+      await this.profileService.delBreakpointDb(this.selectedDb, breakpointDb);
       this.getBreakpointDbList();
     }
   }
@@ -133,8 +130,8 @@ export class ProfileViewComponent {
   }
 
   async renameDb() {
-    const _resault = await this.profileService.renameDb(this.selectedDb, this.dbName);
-    if (_resault['success']) {
+    const resault = await this.profileService.renameDb(this.selectedDb, this.dbName);
+    if (resault['success']) {
       await this.setSelectDb(this.dbName);
       this.changeDbName = false;
     }
@@ -142,17 +139,17 @@ export class ProfileViewComponent {
   }
 
   async save() {
-    let _data = {};
-    _data['name'] = this.user['name'];
-    _data['mail'] = this.user['mail'];
-    _data['breakpoint'] = this.user['breakpoint'];
+    const data = {};
+    data['name'] = this.user['name'];
+    data['mail'] = this.user['mail'];
+    data['breakpoint'] = this.user['breakpoint'];
 
 
-    if (this.pwd_original && this.pwd_new && this.pwd_new == this.pwd_confirm) {
-      _data['pwd'] = this.pwd_original;
-      _data['pwd2'] = this.pwd_new;
+    if (this.pwd_original && this.pwd_new && this.pwd_new === this.pwd_confirm) {
+      data['pwd'] = this.pwd_original;
+      data['pwd2'] = this.pwd_new;
     }
 
-    await this.profileService.set(_data);
+    await this.profileService.set(data);
   }
 }

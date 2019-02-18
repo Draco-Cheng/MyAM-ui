@@ -9,14 +9,14 @@ import { RecordSummarizeLineChartDirectiveComponent } from './record-summarize-l
 
 @NgModule({
   imports: [
-  	CommonModule,
-  	FormsModule,
-  	NgxChartsModule
+    CommonModule,
+    FormsModule,
+    NgxChartsModule
   ],
   declarations: [
-	  RecordSummarizeLineChartDirectiveComponent
+    RecordSummarizeLineChartDirectiveComponent
   ],
   providers: [],
   exports: [RecordSummarizeLineChartDirectiveComponent]
 })
-export class RecordSummarizeLineChartDirectiveModule {}
+export class RecordSummarizeLineChartDirectiveModule { }

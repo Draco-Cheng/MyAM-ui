@@ -8,36 +8,37 @@ import { NotificationHandler } from '../handler/notification.handler';
   constructor(
     private request: RequestHandler,
     private notificationHandler: NotificationHandler
-  ) {};
+  ) { }
 
   private endpoint = '/record'; // URL to web API
 
-  async get(formObj ? : any) {
-    const _url = this.endpoint + '/get';
-    const _data = formObj || { orderBy: ['rid', 'DESC'], limit: 10 };
+  async get(formObj?: any) {
+    const url = this.endpoint + '/get';
+    const data = formObj || { orderBy: ['rid', 'DESC'], limit: 10 };
 
-    if (typeof _data.cashType == 'string')
-      _data.cashType = _data.cashType * 1;
-
-    let _resault = < any[] > await this.request.post(_url, _data);
-
-    if (_resault['success']) {
-      _resault['data'].forEach(record => {
-        let _map = {};
-        record.tids = record.tids ? record.tids.split(",") : [];
-        record.tids.forEach(tid => _map[tid] = true);
-        record.tidsObjMap = _map;
-      });
-    } else {
-      this.notificationHandler.broadcast('error', _resault['message']);
+    if (typeof data.cashType === 'string') {
+      data.cashType = data.cashType * 1;
     }
 
-    return _resault;
+    const resault = <any[]>await this.request.post(url, data);
+
+    if (resault['success']) {
+      resault['data'].forEach(record => {
+        const map = {};
+        record.tids = record.tids ? record.tids.split(',') : [];
+        record.tids.forEach(tid => map[tid] = true);
+        record.tidsObjMap = map;
+      });
+    } else {
+      this.notificationHandler.broadcast('error', resault['message']);
+    }
+
+    return resault;
   }
 
-  async set(recordObj ? : any) {
-    const _url = this.endpoint + '/set';
-    const _data = {
+  async set(recordObj?: any) {
+    const url = this.endpoint + '/set';
+    const data = {
       rid: recordObj.rid,
       cashType: recordObj.cashType * 1,
       cid: recordObj.cid,
@@ -46,44 +47,47 @@ import { NotificationHandler } from '../handler/notification.handler';
       date: recordObj.date
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-    else
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    } else {
       this.notificationHandler.broadcast('success', 'Updated success!');
+    }
 
-    return _resault;
-  };
+    return resault;
+  }
 
   async setType(rid: string, tids) {
-    const _url = this.endpoint + '/setTypes';
-    const _data = {
+    const url = this.endpoint + '/setTypes';
+    const data = {
       rid: rid,
       tids_json: tids
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    }
 
-    return _resault;
-  };
+    return resault;
+  }
 
-  async del(recordObj ? : any) {
-    const _url = this.endpoint + '/del';
-    const _data = {
+  async del(recordObj?: any) {
+    const url = this.endpoint + '/del';
+    const data = {
       rid: recordObj.rid
     };
 
-    const _resault = await this.request.post(_url, _data);
+    const resault = await this.request.post(url, data);
 
-    if (!_resault['success'])
-      this.notificationHandler.broadcast('error', _resault['message']);
-    else
+    if (!resault['success']) {
+      this.notificationHandler.broadcast('error', resault['message']);
+    } else {
       this.notificationHandler.broadcast('success', 'Deleted success!');
+    }
 
-    return _resault;
-  };
+    return resault;
+  }
 }
