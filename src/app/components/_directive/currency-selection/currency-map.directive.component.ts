@@ -1,26 +1,26 @@
 import { Component, Input } from '@angular/core';
 
+// declare function Callback(cid: Cid): void;
+type Callback = (cid: Cid) => void;
+
 @Component({
   selector: '[currency-map]',
   templateUrl: './currency-map.template.html',
   styleUrls: ['./currency-map.style.less'],
   providers: []
 })
-
 export class CurrencyMapDirectiveComponent {
   // *************************************
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() callback: Function;
-  @Input() currencyStructureMap?: Object;
-  @Input() currencyFlatMap?: Object;
-  @Input() inputCid?: any;
-  // *************************************
-  // optional input
+  @Input() callback: Callback;
+  @Input() currencyStructureMap?: CurrencyMap;
+  @Input() currencyFlatMap?: CurrencyMap;
+  @Input() inputCid?: Cid;
   // *************************************
   // internal input
-  @Input() currentNode?: any;
+  @Input() currentNode?: CurrencyNode;
   // *************************************
 
   constructor() { }
@@ -32,12 +32,12 @@ export class CurrencyMapDirectiveComponent {
     }
   }
 
-  objKeys(obj) {
+  objKeys(obj: object): string[] {
     return Object.keys(obj);
   }
 
-  getType(tid) {
-    return this.currencyFlatMap[tid].type;
+  getType(cid: Cid): string {
+    return this.currencyFlatMap[cid].type;
   }
 
 }

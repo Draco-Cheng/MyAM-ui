@@ -35,20 +35,18 @@ export class RecordSummarizeLineChartDirectiveComponent implements OnInit {
     this.__isInit = true;
   }
 
-
-  async buildSummerize() {
-
+  async buildSummerize(): Promise<void> {
     this.daySummerize = this.getDaySummerize();
     await this.buildLineChartData(this.daySummerize);
   }
 
-  async buildLineChartData(summerize) {
+  async buildLineChartData(summerize): Promise<void> {
     summerize = summerize || this.daySummerize;
     this.summerizeForLineChartObj = await this.summarizeService.daySummerizeToLineChart(summerize);
     this.renderLineChart();
   }
 
-  renderLineChart() {
+  renderLineChart(): void {
     switch (this.lineChartSelected) {
       case '':
         this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj['Cost'], this.summerizeForLineChartObj['Earn']]);
@@ -59,7 +57,7 @@ export class RecordSummarizeLineChartDirectiveComponent implements OnInit {
     }
   }
 
-  onSelect() {
+  onSelect(): void {
     this.renderLineChart();
   }
 }
