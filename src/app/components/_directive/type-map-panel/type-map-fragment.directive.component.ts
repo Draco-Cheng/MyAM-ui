@@ -59,13 +59,13 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
       const unclassifiedNodes = {};
       const listOfChild = [];
 
-      _.map(typesMapFlat, (node, key) => {
+      _.map(typesMapFlat, (node: TypeMapFlat, key: Tid | '_unclassified') => {
         if (key !== '_unclassified') {
           Object.keys(node['childs']).forEach(tid => listOfChild.push(tid));
         }
       });
 
-      _.map(typesFlat, (node, tid) => {
+      _.map(typesFlat, (node: TypeMapFlat, tid: Tid) => {
         if (node.master) {
           node.showInMap && childNodes.push(tid);
         } else {

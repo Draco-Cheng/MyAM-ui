@@ -51,7 +51,7 @@ export class TypeMapPanelDirectiveComponent implements OnInit {
   async getTypes(): Promise<void> {
     this.__meta['types'] = await this.typeService.get();
     this.types = this.__meta['types']['data'];
-    this.types.forEach(element => {
+    this.types.forEach((element: TypeNode) => {
       this.typesFlat[element.tid] = element;
     });
   }
