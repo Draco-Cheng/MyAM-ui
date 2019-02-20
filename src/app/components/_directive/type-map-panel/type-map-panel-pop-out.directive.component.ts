@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: '[type-map-panel-pop-out]',
@@ -7,17 +7,15 @@ import { Component, Input, OnInit } from '@angular/core';
   providers: []
 })
 
-export class TypeMapPanelPopOutDirectiveComponent implements OnInit {
+export class TypeMapPanelPopOutDirectiveComponent {
   // *************************************
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() selectedTids: Object;
-  @Input() disabledTids?: Object;
-  @Input() callback: Function;
+  @Input() selectedTids: TypeFlatMap;
+  @Input() disabledTids?: TypeFlatMap;
+  @Input() callback: TypeMapCallback;
   // *************************************
 
   constructor() { }
-
-  async ngOnInit() { }
 }

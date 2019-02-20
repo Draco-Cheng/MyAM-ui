@@ -5,6 +5,8 @@ import { SummarizeService } from '../../../service/summarize.service';
 
 import { NgxLineChartConf } from './ngx-line-chart-conf';
 
+type GetDaySummerize = () => DailySummerize[];
+
 @Component({
   selector: '[record-summarize-line-chart]',
   templateUrl: './record-summarize-line-chart.template.html',
@@ -16,15 +18,15 @@ import { NgxLineChartConf } from './ngx-line-chart-conf';
 })
 
 export class RecordSummarizeLineChartDirectiveComponent implements OnInit {
-  @Input() getDaySummerize: Function;
+  @Input() getDaySummerize: GetDaySummerize;
 
   public __isInit = false;
   private __meta = {};
 
   private lineChartSelected = '';
-  private daySummerize;
-  private summerizeForLineChartObj;
-  private summerizeForLineChart;
+  private daySummerize: DailySummerize[];
+  private summerizeForLineChartObj: SummerizeDataToLineChart;
+  private summerizeForLineChart: NgxLineChartConf;
 
   constructor(
     private summarizeService: SummarizeService,
@@ -40,7 +42,7 @@ export class RecordSummarizeLineChartDirectiveComponent implements OnInit {
     await this.buildLineChartData(this.daySummerize);
   }
 
-  async buildLineChartData(summerize): Promise<void> {
+  async buildLineChartData(summerize: DailySummerize[]): Promise<void> {
     summerize = summerize || this.daySummerize;
     this.summerizeForLineChartObj = await this.summarizeService.daySummerizeToLineChart(summerize);
     this.renderLineChart();
@@ -49,10 +51,10 @@ export class RecordSummarizeLineChartDirectiveComponent implements OnInit {
   renderLineChart(): void {
     switch (this.lineChartSelected) {
       case '':
-        this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj['Cost'], this.summerizeForLineChartObj['Earn']]);
+        this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj.cost, this.summerizeForLineChartObj.earn]);
         break;
       case 'SUM':
-        this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj['Sum']]);
+        this.summerizeForLineChart = new NgxLineChartConf([this.summerizeForLineChartObj.sum]);
         break;
     }
   }

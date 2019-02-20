@@ -2,6 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 
+type Callback = (tid) => void;
+
 @Component({
   selector: 'type-quick-list',
   templateUrl: './type-quick-list.template.html',
@@ -14,42 +16,38 @@ export class TypeQuickListDirectiveComponent implements OnInit {
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() selectedTids: Object;
-  @Input() callback: Function;
-  // *************************************
-  // optional input
-  @Input() inputCid?: String;
+  @Input() selectedTids: TypeFlatMap;
+  @Input() callback: Callback;
   // *************************************
 
   public __isInit = false;
   private __meta = {};
 
-  private types;
-  public typeQuickList;
+  private types: TypeNode[];
+  public typeQuickList: TypeNode[];
 
   constructor(
     private typeService: TypeService,
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getTypes();
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() {
+  async __checkDataUpToDate(): Promise<void> {
     if (this.__meta['types']['legacy']) {
       await this.getTypes();
     }
   }
 
-  async getTypes() {
+  async getTypes(): Promise<void> {
     this.__meta['types'] = await this.typeService.get();
     this.types = this.__meta['types']['data'];
     this.typeQuickList = this.types.filter(type => type.quickSelect);
   }
 
-  isCheck(type) {
-
+  isCheck(type: TypeNode): boolean {
     return this.selectedTids[type.tid];
   }
 }

@@ -13,35 +13,35 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() typesFlat: any;
-  @Input() typesMapFlatMeta: any;
-  @Input() callback: Function;
-  @Input() selectedTids: Object;
-  @Input() disabledTids?: Object;
+  @Input() typesFlat: TypeFlat;
+  @Input() typesMapFlatMeta: CacheEle<TypeMapFlat>;
+  @Input() callback: TypeMapCallback;
+  @Input() selectedTids: TypeFlatMap;
+  @Input() disabledTids?: TypeFlatMap;
   // *************************************
   // internal input
   @Input() parentNodes?: string;
-  @Input() currentNode?: number | string;
+  @Input() currentNode?: string;
   // *************************************
 
-  public childNode;
+  public childNode: Tid[];
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.parentNodes = this.parentNodes || '';
     this.currentNode && (this.parentNodes += this.currentNode + ',');
     this.getChildNode();
   }
 
-  __checkDataUpToDate() {
+  __checkDataUpToDate(): boolean {
     if (this.typesMapFlatMeta['legacy']) {
       this.getChildNode();
     }
     return true;
   }
 
-  getChildNode() {
+  getChildNode(): void {
     const parentNodes = this.parentNodes;
     const currentNode = this.currentNode;
     const typesFlat = this.typesFlat;
@@ -51,7 +51,7 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
     if (currentNode) {
       if (typesMapFlat[currentNode] && typesMapFlat[currentNode]['childs']) {
         Object.keys(typesMapFlat[currentNode]['childs'])
-          .forEach(tid => {
+          .forEach((tid: Tid) => {
             typesFlat[tid].showInMap && parentNodes.indexOf(tid) === -1 && childNodes.push(tid);
           });
       }
@@ -80,15 +80,15 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
     }
   }
 
-  onSelect(node) {
-    this.callback(node, this.typesFlat[node].type_label);
+  onSelect(tid: Tid) {
+    this.callback(tid, this.typesFlat[tid].type_label);
   }
 
-  classCheck(node) {
-    if (this.disabledTids && this.disabledTids[node]) {
+  classCheck(tid: Tid) {
+    if (this.disabledTids && this.disabledTids[tid]) {
       return 'disabled';
     }
-    if (this.selectedTids[node]) {
+    if (this.selectedTids[tid]) {
       return 'checked';
     }
 

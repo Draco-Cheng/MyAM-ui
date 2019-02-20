@@ -178,7 +178,7 @@ import { CurrencyService } from './currency.service';
       let typeNoneEarnSum = 0;
 
       Object.keys(typeNoneSum)
-        .forEach(cid => {
+        .forEach((cid: Cid) => {
           const typeNoneSumRecord = typeNoneSum[cid];
           typeNoneCostSum += this.currencyService.exchange(cid, null, typeNoneSumRecord['priceCost'])['value'];
           typeNoneEarnSum += this.currencyService.exchange(cid, null, typeNoneSumRecord['priceEarn'])['value'];
@@ -195,10 +195,10 @@ import { CurrencyService } from './currency.service';
     return ngxChartData;
   }
 
-  async daySummerizeToLineChart(daySummerize) {
+  async daySummerizeToLineChart(daySummerize: DailySummerize[]): Promise<SummerizeDataToLineChart> {
     const ngxChartData = {};
 
-    ['Cost', 'Earn', 'Sum'].forEach(valeType => {
+    ['cost', 'earn', 'sum'].forEach((valeType: string) => {
       ngxChartData[valeType] = {
         'name': valeType,
         'series': []
@@ -208,15 +208,15 @@ import { CurrencyService } from './currency.service';
     let valueCost = 0;
     let valueEarn = 0;
 
-    daySummerize.forEach(dayRecord => {
+    daySummerize.forEach((dayRecord: DailySummerize) => {
       valueCost += dayRecord['cost'] || 0;
       valueEarn += dayRecord['earn'] || 0;
 
-      ngxChartData['Cost']['series'].push({ name: dayRecord['date'], value: valueCost });
-      ngxChartData['Earn']['series'].push({ name: dayRecord['date'], value: valueEarn });
-      ngxChartData['Sum']['series'].push({ name: dayRecord['date'], value: valueEarn - valueCost });
+      ngxChartData['cost']['series'].push({ name: dayRecord['date'], value: valueCost });
+      ngxChartData['earn']['series'].push({ name: dayRecord['date'], value: valueEarn });
+      ngxChartData['sum']['series'].push({ name: dayRecord['date'], value: valueEarn - valueCost });
     });
 
-    return ngxChartData;
+    return <SummerizeDataToLineChart>ngxChartData;
   }
 }

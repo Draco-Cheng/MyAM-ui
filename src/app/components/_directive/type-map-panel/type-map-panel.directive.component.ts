@@ -1,6 +1,7 @@
 import { Component, Input, ElementRef, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
+import { promise } from 'protractor';
 
 @Component({
   selector: '[type-map-panel]',
@@ -15,30 +16,30 @@ export class TypeMapPanelDirectiveComponent implements OnInit {
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() selectedTids: Object;
-  @Input() disabledTids?: Object;
-  @Input() callback: Function;
+  @Input() selectedTids: TypeFlatMap;
+  @Input() disabledTids?: TypeFlatMap;
+  @Input() callback: TypeMapCallback;
   // *************************************
 
   public __isInit = false;
   private __meta = {};
 
-  private types;
-  private typesFlat = {};
-  private typesMapFlatMeta;
+  private types: TypeNode[];
+  private typesFlat: TypeFlat = {};
+  private typesMapFlatMeta: TypeMapFlat;
 
   constructor(
     private typeService: TypeService,
     private elementRef: ElementRef
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getTypes();
     await this.getTypesFlatMap();
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() {
+  async __checkDataUpToDate(): Promise<void> {
     if (this.__meta['types']['legacy']) {
       await this.getTypes();
     }
@@ -47,7 +48,7 @@ export class TypeMapPanelDirectiveComponent implements OnInit {
     }
   }
 
-  async getTypes() {
+  async getTypes(): Promise<void> {
     this.__meta['types'] = await this.typeService.get();
     this.types = this.__meta['types']['data'];
     this.types.forEach(element => {
@@ -55,7 +56,7 @@ export class TypeMapPanelDirectiveComponent implements OnInit {
     });
   }
 
-  async getTypesFlatMap() {
+  async getTypesFlatMap(): Promise<void> {
     this.__meta['typesMapFlat'] = await this.typeService.getFlatMap();
     this.typesMapFlatMeta = this.__meta['typesMapFlat'];
   }

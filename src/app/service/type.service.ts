@@ -40,7 +40,7 @@ const tidRelatedCache = {
     tidRelatedCache['rootChildsInNextLayer'] = null;
   }
 
-  async get(formObj?: any) {
+  async get(formObj?: any): Promise<CacheEle<TypeNode[]>> {
     const cacheName = 'type';
     const cache = await this.cacheHandler.get(cacheName, true);
 
@@ -85,7 +85,7 @@ const tidRelatedCache = {
     typeData.forEach(type => tidRelatedCache['tidToLabelMap'][type.tid] = type.type_label);
   }
 
-  async getFlatMap() {
+  async getFlatMap(): Promise<CacheEle<TypeMapFlat> | void> {
     const cacheName = 'type.flatmap';
     const cache = await this.cacheHandler.get(cacheName, true);
 

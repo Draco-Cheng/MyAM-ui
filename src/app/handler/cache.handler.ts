@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 
 const memoryCache = {};
 
-class CacheEle {
+class CacheEle<T> {
   status = -1; // -1 notReady, 0 async progress, 1 ready
   legacy = false;
   waitingQue = [];
-  data = null;
+  data: T = null;
   constructor() { }
 }
 
@@ -23,8 +23,8 @@ class CacheEle {
   }
 
   // if_not_exist_will_create_async_later: if not ready, return cache inmmediatly and set status to 'aync'
-  async get(name: string, if_not_exist_will_create_async_later?: boolean) {
-    const cache = memoryCache[name] = memoryCache[name] || new CacheEle();
+  async get<T>(name: string, if_not_exist_will_create_async_later?: boolean) {
+    const cache = memoryCache[name] = memoryCache[name] || new CacheEle<T>();
     switch (cache.status) {
       case -1:
         if (if_not_exist_will_create_async_later) {
@@ -39,8 +39,8 @@ class CacheEle {
     return Promise.resolve(cache);
   }
 
-  set(name: string, data) {
-    const cache = memoryCache[name] = memoryCache[name] || new CacheEle();
+  set<T>(name: string, data: T) {
+    const cache = memoryCache[name] = memoryCache[name] || new CacheEle<T>();
     cache['legacy'] = false;
     cache['status'] = 1;
     cache['data'] = data;
@@ -49,8 +49,8 @@ class CacheEle {
     cache['waitingQue'] = [];
   }
 
-  regAsyncReq(name) {
-    const cache = memoryCache[name] = memoryCache[name] || new CacheEle();
+  regAsyncReq<T>(name) {
+    const cache = memoryCache[name] = memoryCache[name] || new CacheEle<T>();
     cache['status'] = 0;
 
     return data => {
