@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 
+type CurrencyExchange = (cid: Cid, value: number ) => number;
+
 @Component({
   selector: '[record-sum-type-map-fragment]',
   templateUrl: './record-sum-type-map-fragment.template.html',
@@ -13,20 +15,20 @@ export class RecordSumTypeMapFragmentDirectiveComponent implements OnInit {
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() typesFlat: any;
-  @Input() typesMapFlatMeta: any;
-  @Input() typeSummerize: any;
-  @Input() currencyEx: Function;
-  @Input() defaultCid: any;
-  @Input() currencyFlatMap: any;
+  @Input() typesFlat: TypeFlat;
+  @Input() typesMapFlatMeta: CacheEle<TypeMapFlat>;
+  @Input() typeSummerize: SummerizeByType;
+  @Input() currencyEx: CurrencyExchange;
+  @Input() defaultCid: Cid;
+  @Input() currencyFlatMap: CurrencyMap;
   // *************************************
   // internal input
 
   @Input() parentNodes?: string;
-  @Input() currentNode?: number | string;
+  @Input() currentNode?: string;
   // *************************************
 
-  public childNode;
+  public childNode: Tid[];
 
   constructor() { }
 
@@ -56,13 +58,13 @@ export class RecordSumTypeMapFragmentDirectiveComponent implements OnInit {
       const unclassifiedNodes = {};
       const listOfChild = [];
 
-      _.map(_typesMapFlat, (val, key) => {
+      _.map(_typesMapFlat, (val: TypeMapNode, key: Tid) => {
         if (key !== '_unclassified') {
           Object.keys(val['childs']).forEach(tid => listOfChild.push(tid));
         }
       });
 
-      _.map(_typesFlat, (node, tid) => {
+      _.map(_typesFlat, (node: TypeNode, tid: Tid) => {
         if (node.master) {
           _typeSummerize['types'][tid] && _childNodes.push(tid);
         } else {
@@ -77,17 +79,17 @@ export class RecordSumTypeMapFragmentDirectiveComponent implements OnInit {
     }
   }
 
-  cidToLabel(cid) {
+  cidToLabel(cid: Cid): CurrencyType {
     return this.currencyFlatMap[cid]['type'];
   }
 
   objArr(obj: object) {
-    return _.map(obj, (val, key) => {
+    return _.map(obj, (val: any, key: string) => {
       return { key: key, data: val };
     });
   }
 
-  roundPrice(num) {
+  roundPrice(num: number): number {
     if (num === 0) {
       return 0;
     }

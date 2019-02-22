@@ -20,3 +20,27 @@ interface SummerizeDataToLineChart {
   earn: NgxChartLineChartData,
   sum: NgxChartLineChartData
 }
+
+type SummerizeCurrenyNode = {
+  [cid: string]: {
+    count: number,
+    priceCost: number,
+    priceEarn: number,
+  }
+}
+
+interface SummerizeTypesCurrenyNode {
+  [tid: string]: SummerizeCurrenyNode
+}
+
+interface SummerizeByType {
+  sum: {
+    count: number,
+    priceCost: number,
+    priceEarn: number,
+    sum: number
+  },
+  total: SummerizeCurrenyNode,
+  typeNone: SummerizeCurrenyNode,
+  types: SummerizeTypesCurrenyNode
+}

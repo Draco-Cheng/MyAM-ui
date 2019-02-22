@@ -40,7 +40,7 @@ let currencyMapForExchangeMemoryCache = null;
     }
   }
 
-  getDefaultCid() {
+  getDefaultCid(): Cid {
     return this.config.get('cid');
   }
 

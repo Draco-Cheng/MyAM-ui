@@ -85,7 +85,7 @@ const tidRelatedCache = {
     typeData.forEach(type => tidRelatedCache['tidToLabelMap'][type.tid] = type.type_label);
   }
 
-  async getFlatMap(): Promise<CacheEle<TypeMapFlat> | void> {
+  async getFlatMap(): Promise<CacheEle<TypeMapFlat>> {
     const cacheName = 'type.flatmap';
     const cache = await this.cacheHandler.get(cacheName, true);
 

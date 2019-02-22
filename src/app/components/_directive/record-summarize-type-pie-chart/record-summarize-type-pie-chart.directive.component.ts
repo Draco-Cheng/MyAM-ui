@@ -1,9 +1,11 @@
-import { Component, Input, Output, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { TypeService } from '../../../service/type.service';
 import { SummarizeService } from '../../../service/summarize.service';
 
 import { NgxPieChartConf } from './ngx-pie-chart-conf';
+
+type GetTypeSummerize = () => SummerizeByType;
 
 @Component({
   selector: '[record-summarize-type-pie-chart]',
@@ -16,36 +18,33 @@ import { NgxPieChartConf } from './ngx-pie-chart-conf';
 })
 
 export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
-  @Input() getTypeSummerize: Function;
+  @Input() getTypeSummerize: GetTypeSummerize;
 
   public __isInit = false;
   private __meta = {};
-  private typesMapFlat;
+  private typesMapFlat: TypeMapFlat;
 
-  private typePiChart;
   private typeIdSelected = 'OVERVIEW';
-  private typeSummerize;
-  private typeSummerizeForPieChart;
-  private sumTidsHasChilds;
+  private typeSummerize: SummerizeByType;
+  public typeSummerizeForPieChart: NgxPieChartConf;
+  public sumTidsHasChilds: Tid[];
 
   constructor(
     private typeService: TypeService,
     private summarizeService: SummarizeService,
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getTypes();
     await this.buildSummerize();
     this.__isInit = true;
   }
 
-  async getTypes() {
+  async getTypes(): Promise<void> {
     this.typesMapFlat = (await this.typeService.getFlatMap())['data'];
   }
 
-  async buildSummerize() {
-    const _typeIdsForChart = [];
-
+  async buildSummerize(): Promise<void> {
     this.typeSummerize = this.getTypeSummerize();
 
     await this.buildPieChartData(this.typeSummerize);
@@ -54,14 +53,14 @@ export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
     this.sumTidsHasChilds = await this.getSumTidsHasChilds(this.typeSummerize);
   }
 
-  async getSumTidsHasChilds(summerize) {
+  getSumTidsHasChilds(summerize: SummerizeByType): Tid[] {
     summerize = summerize || this.typeSummerize;
     const typesMapFlat = this.typesMapFlat;
 
     const sumTypeIds = Object.keys(summerize['types']);
     const sumTypeParentTidsFlat = {};
 
-    sumTypeIds.forEach(tid => {
+    sumTypeIds.forEach((tid: Tid) => {
       !!typesMapFlat[tid] && Object.assign(sumTypeParentTidsFlat, typesMapFlat[tid]['parents']);
     });
 
@@ -69,14 +68,17 @@ export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
 
   }
 
-  async buildPieChartData(summerize?) {
+  async buildPieChartData(summerize?: SummerizeByType): Promise<void> {
     summerize = summerize || this.typeSummerize;
 
 
-    let typeListChild;
-    let typeListUnclassified;
-    let childsList;
-    let showTypeNone;
+    let typeListChild: Tid[];
+    let typeListUnclassified: Tid[];
+    let childsList: {
+      childs: Tid[];
+      unclassified: Tid[];
+    };
+    let showTypeNone: boolean;
     switch (this.typeIdSelected) {
       case 'OVERVIEW':
         childsList = await this.typeService.getChildsInNextLayer(null, true);
@@ -102,11 +104,11 @@ export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
     this.typeSummerizeForPieChart = new NgxPieChartConf(_pieCharData);
   }
 
-  tidToLabel(tid) {
+  tidToLabel(tid: Tid): string {
     return this.typeService.tidToLable(tid);
   }
 
-  onSelectTid() {
+  onSelectTid(): void {
     this.buildPieChartData();
   }
 }

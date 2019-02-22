@@ -1,4 +1,4 @@
-type Tid = string;
+type Tid = '_unclassified' | string;
 
 interface TypeNode {
   cashType: number,
@@ -20,13 +20,6 @@ interface TypeFlatMap {
 
 interface TypeMapNode {
   [tid: string]: 1 | null
-}
-
-interface TypeMapFlat {
-  _unclassified: {
-    childs?: TypeMapNode,
-    parents?: TypeMapNode
-  }
 }
 
 interface TypeMapFlat {

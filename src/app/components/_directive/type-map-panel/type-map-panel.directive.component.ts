@@ -26,7 +26,7 @@ export class TypeMapPanelDirectiveComponent implements OnInit {
 
   private types: TypeNode[];
   private typesFlat: TypeFlat = {};
-  private typesMapFlatMeta: TypeMapFlat;
+  private typesMapFlatMeta: CacheEle<TypeMapFlat>;
 
   constructor(
     private typeService: TypeService,

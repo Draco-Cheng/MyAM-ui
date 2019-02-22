@@ -4,6 +4,19 @@ import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 
+type GetTypeSummerize = () => SummerizeByType;
+
+interface CurrencyTotalSummerize {
+  [currencyType: string]: {
+    count: number;
+    priceCost: number;
+    priceEarn: number;
+    isExchange?: boolean;
+    priceCostExchange?: number;
+    priceEarnExchange?: number;
+  };
+}
+
 @Component({
   selector: '[record-summarize-type-flat]',
   templateUrl: './record-summarize-type-flat.template.html',
@@ -16,41 +29,41 @@ import { CurrencyService } from '../../../service/currency.service';
 })
 
 export class RecordSummarizeTypeFlatDirectiveComponent implements OnInit {
-  @Input() getTypeSummerize: Function;
+  @Input() getTypeSummerize: GetTypeSummerize;
 
   public __isInit = false;
   private __meta = {};
 
-  private types;
-  private typesFlat = {};
-  private typesMapFlatMeta;
-  public typeSummerize;
-  private currencyTotalSummerize;
+  private types: TypeNode[];
+  private typesFlat: TypeFlat = {};
+  private typesMapFlatMeta: CacheEle<TypeMapFlat>;
+  public typeSummerize: SummerizeByType;
+  private currencyTotalSummerize: CurrencyTotalSummerize;
 
-  private currencyFlatMap;
+  private currencyFlatMap: CurrencyMap;
 
-  private defaultCid;
-  private summarizeReady;
+  private defaultCid: Cid;
+  private summarizeReady: boolean;
   constructor(
     private recordsService: RecordsService,
     private typeService: TypeService,
     private currencyService: CurrencyService
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getTypes();
     await this.getCurrency();
     this.buildSummerize();
     this.__isInit = true;
   }
 
-  async getCurrency() {
+  async getCurrency(): Promise<void> {
     const _currencyMap = await this.currencyService.getMap();
     this.currencyFlatMap = _currencyMap['data']['flatMap'];
     this.defaultCid = this.currencyService.getDefaultCid();
   }
 
-  async getTypes() {
+  async getTypes(): Promise<void> {
     this.__meta['types'] = await this.typeService.get();
     this.typesMapFlatMeta = await this.typeService.getFlatMap();
 
@@ -61,7 +74,7 @@ export class RecordSummarizeTypeFlatDirectiveComponent implements OnInit {
     });
   }
 
-  async buildSummerize() {
+  async buildSummerize(): Promise<void> {
     this.summarizeReady = false;
 
     this.typeSummerize = this.getTypeSummerize();
@@ -70,7 +83,7 @@ export class RecordSummarizeTypeFlatDirectiveComponent implements OnInit {
     setTimeout(() => this.summarizeReady = true);
   }
 
-  buildTotalByCurrencyType(totalObj) {
+  buildTotalByCurrencyType(totalObj: SummerizeCurrenyNode) {
     const mergeTotal = this.currencyTotalSummerize = {};
     const defaultCurrencyType = this.cidToCtype(this.defaultCid);
     Object.keys(totalObj)
@@ -100,19 +113,19 @@ export class RecordSummarizeTypeFlatDirectiveComponent implements OnInit {
       });
   }
 
-  objKey(obj) {
+  objKey(obj: object): string[] {
     return Object.keys(obj);
   }
 
-  cidToCtype(cid) {
+  cidToCtype(cid: Cid): CurrencyType {
     return this.currencyFlatMap[cid]['type'];
   }
 
-  currencyEx = (cid, value) => {
+  currencyEx = (cid: Cid, value: number): number => {
     return this.currencyService.exchange(cid, this.defaultCid, value)['value'];
   }
 
-  roundPrice(num) {
+  roundPrice(num: number): number {
     if (num === 0) {
       return 0;
     }

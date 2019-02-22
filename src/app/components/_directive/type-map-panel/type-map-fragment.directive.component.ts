@@ -80,11 +80,11 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
     }
   }
 
-  onSelect(tid: Tid) {
+  onSelect(tid: Tid): void {
     this.callback(tid, this.typesFlat[tid].type_label);
   }
 
-  classCheck(tid: Tid) {
+  classCheck(tid: Tid): string {
     if (this.disabledTids && this.disabledTids[tid]) {
       return 'disabled';
     }
