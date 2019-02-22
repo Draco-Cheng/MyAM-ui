@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { CurrencyService } from '../../../service/currency.service';
+import { promise } from 'protractor';
 
 function formatDate(date) {
   const d = new Date(date);
@@ -33,11 +34,11 @@ export class CurrencyViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
-  private currencyFlatMap;
-  private currencyStructureMap;
-  private currencyList;
+  private currencyFlatMap: CurrencyMap;
+  private currencyStructureMap: CurrencyMap;
+  private currencyList: CurrencyList;
 
-  private newCurrency = {
+  private newCurrency: CurrencyNode = {
     type: '',
     rate: 1,
     to_cid: null,
@@ -54,47 +55,47 @@ export class CurrencyViewComponent implements OnInit {
     this.currencyList = this.currencyService.getCurrencyList();
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getCurrency();
     this.newCurrency['to_cid'] = this.getDefaultCid();
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() {
+  async __checkDataUpToDate(): Promise<void> {
     if (this.__meta['currencyMap']['legacy']) {
       await this.getCurrency();
     }
   }
 
-  getDefaultCid() {
+  getDefaultCid(): Cid {
     return this.currencyService.getDefaultCid();
   }
 
-  setDefaultCurrency = cid => {
-    return this.currencyService.setDefaultCid(cid);
+  setDefaultCurrency = (cid: Cid): void => {
+    this.currencyService.setDefaultCid(cid);
   }
 
-  async getCurrency() {
+  async getCurrency(): Promise<void> {
     this.__meta['currencyMap'] = await this.currencyService.getMap();
     this.currencyStructureMap = this.__meta['currencyMap']['data']['structureMap'];
     this.currencyFlatMap = this.__meta['currencyMap']['data']['flatMap'];
   }
 
-  getType(tid) {
-    return this.currencyFlatMap[tid].type;
+  getType(cid: Cid): CurrencyType {
+    return this.currencyFlatMap[cid].type;
   }
 
-  getCurrentMainType() {
+  getCurrentMainType(): CurrencyType {
     return this.getType(Object.keys(this.currencyStructureMap)[0]);
   }
 
-  getSelectionCallback(currency) {
-    return cid => {
+  getSelectionCallback(currency: CurrencyNode) {
+    return (cid: Cid): void => {
       currency.to_cid = cid;
     };
   }
 
-  async save(newCurrency) {
+  async save(newCurrency: CurrencyNode): Promise<void> {
     await this.currencyService.add(newCurrency);
 
     newCurrency.memo = '';

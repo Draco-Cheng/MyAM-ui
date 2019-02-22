@@ -18,18 +18,16 @@ export class AdminViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
-  private profileMap;
+  public profileMap: ProfileMap;
 
-  private userList;
+  private userList: UserData[];
 
   constructor(
     private profileService: ProfileService,
     private adminServer: AdminServer
-  ) {
+  ) { }
 
-  }
-
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.__meta['userList'] = await this.adminServer.getUserList();
     this.userList = _.cloneDeep(this.__meta['userList']['data']);
     this.profileMap = this.profileService.getProfileMap();
@@ -37,9 +35,9 @@ export class AdminViewComponent implements OnInit {
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() {}
+  async __checkDataUpToDate() { }
 
-  loginInfoToStr(str) {
+  loginInfoToStr(str: string): string[] {
     if (!str) {
       return [];
     }
@@ -48,15 +46,15 @@ export class AdminViewComponent implements OnInit {
     return [info[0], this.dateString(info[1])];
   }
 
-  dateString(time) {
-    return new Date(time * 1).toLocaleDateString();
+  dateString(time: string): string {
+    return new Date(_.parseInt(time)).toLocaleDateString();
   }
 
-  objKeys(obj) {
+  objKeys(obj: object): string[] {
     return Object.keys(obj);
   }
 
-  async resetPwd(user) {
+  async resetPwd(user: UserData): Promise<void> {
     const data = {
       target_uid: user['uid'],
       newPwd: user['newPwd']
@@ -65,14 +63,13 @@ export class AdminViewComponent implements OnInit {
     await this.adminServer.setUser(data);
 
     user['newPwd'] = '';
-
   }
 
-  async updateUser(user) {
+  async updateUser(user: UserData): Promise<void> {
     const data = {
       target_uid: user['uid'],
-      status: _.parseInt(user['status']),
-      permission: _.parseInt(user['permission'])
+      status: typeof user['status'] === 'string' ? _.parseInt(user['status']) : user['status'],
+      permission: typeof user['permission'] === 'string' ? _.parseInt(user['permission']) : user['permission']
     };
 
     const resault = await this.adminServer.setUser(data);

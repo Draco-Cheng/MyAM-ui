@@ -11,11 +11,11 @@ import { CurrencyService } from '../../../service/currency.service';
 })
 
 export class CurrencyEditMapDirectiveComponent {
-  @Input() currentNode?: any;
-  @Input() currencyStructureMap?: any;
-  @Input() currencyFlatMap?: any;
+  @Input() currentNode?: CurrencyNode;
+  @Input() currencyStructureMap?: CurrencyMap;
+  @Input() currencyFlatMap?: CurrencyMap;
 
-  private currencyList;
+  private currencyList: CurrencyList;
 
   constructor(
     private currencyService: CurrencyService
@@ -23,26 +23,26 @@ export class CurrencyEditMapDirectiveComponent {
     this.currencyList = this.currencyService.getCurrencyList();
   }
 
-  objKeys(obj) {
+  objKeys(obj: object): string[] {
     return Object.keys(obj);
   }
 
-  getType(tid) {
-    return this.currencyFlatMap[tid].type;
+  getType(cid: Cid): CurrencyType {
+    return this.currencyFlatMap[cid].type;
   }
 
-  getSelectionCallback(currency) {
+  getSelectionCallback(currency: CurrencyNode): (cid: Cid) => void {
     return cid => {
       currency.to_cid = cid;
     };
   }
 
-  async del(node) {
+  async del(node: CurrencyNode): Promise<void> {
     await this.currencyService.del(node.cid);
   }
 
-  async save(node) {
+  async save(node: CurrencyNode): Promise<void> {
     await this.currencyService.set(node);
-    node.isChange = false;
+    node['isChange'] = false;
   }
 }

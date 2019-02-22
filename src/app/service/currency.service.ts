@@ -186,8 +186,8 @@ let currencyMapForExchangeMemoryCache = null;
     return resault;
   }
 
-  setDefaultCid(cid) {
-    localStorage.setItem(this.config.get('uid') + '.cid', cid);
+  setDefaultCid(cid: Cid): void {
+    localStorage.setItem(this.config.get('uid') + '.cid', cid.toString());
     this.config.set('cid', cid);
   }
 
