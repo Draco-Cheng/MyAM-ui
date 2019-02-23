@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-type NotificationType = 'error' | 'warn' | 'success';
-
 interface NotificationItem {
   type: NotificationType;
   msg: string;

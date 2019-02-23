@@ -13,7 +13,7 @@ class CacheEle<T> {
 @Injectable() export class CacheHandler {
   constructor() { }
 
-  async wipe(name) {
+  async wipe(name: string) {
     const cache = memoryCache[name];
 
     if (cache) {
@@ -49,7 +49,7 @@ class CacheEle<T> {
     cache['waitingQue'] = [];
   }
 
-  regAsyncReq<T>(name) {
+  regAsyncReq<T>(name: string) {
     const cache = memoryCache[name] = memoryCache[name] || new CacheEle<T>();
     cache['status'] = 0;
 

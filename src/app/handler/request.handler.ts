@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+// TODO: use HTTP client instead
+import { Http, Headers } from '@angular/http';
 import * as _ from 'lodash';
 
 import { i18n } from '../i18n/i18n';
@@ -7,7 +8,14 @@ import { i18n } from '../i18n/i18n';
 import { ConfigHandler } from './config.handler';
 import { CryptHandler } from './crypt.handler';
 
-const buildResObj = (arg0?, arg1?, arg2?) => {
+interface ReturnObject {
+  success: boolean;
+  code: string;
+  message: string;
+  data: any;
+}
+
+const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): ReturnObject => {
   const obj = {
     success: null,
     code: null,
@@ -35,8 +43,8 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
 };
 
 @Injectable() export class RequestHandler {
-  private encrypt;
-  private authTokenBase;
+  private encrypt: (str: string) => string;
+  private authTokenBase: string;
 
   constructor(
     public http: Http,
@@ -50,7 +58,7 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
     'Content-Type': 'application/json'
   });
 
-  async post(path: string, formObj: any = {}) {
+  async post(path: string, formObj: any = {}): Promise<ReturnObject> {
     const data = _.cloneDeep(formObj);
     const salt = Date.now().toString();
 
@@ -65,7 +73,7 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
     this.headers.set('Auth-Token', this.encrypt(this.authTokenBase + salt));
 
     // <any[]> predefine resolve return value type
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<ReturnObject>((resolve, reject) => {
       this.http.post(this.config.get('server_domain') + path, JSON.stringify(data), { headers: this.headers })
         .subscribe(
           responseData => resolve(buildResObj(responseData.status, responseData.json())),
@@ -82,7 +90,7 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
     });
   }
 
-  downloadFile(fileName, data) {
+  downloadFile(fileName: string, data: any): void {
     const blob = new Blob([data], { type: 'multipart/form-data' });
     const url = window.URL.createObjectURL(data);
     const a = document.createElement('a');
@@ -129,7 +137,7 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
     });
   }
 
-  async upload(path: string, formObj: {}) {
+  async upload(path: string, formObj: {}): Promise<ReturnObject> {
     const salt = Date.now().toString();
     const formData = new FormData();
 
@@ -170,7 +178,7 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
   }
 
 
-  async login(path: string, formObj: any = {}) {
+  async login(path: string, formObj: any = {}): Promise<ReturnObject> {
     const postData = {};
     const salt = Date.now();
     formObj = _.cloneDeep(formObj);
@@ -212,7 +220,7 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
     });
   }
 
-  async loginByToken(path: string, formObj: any = {}) {
+  async loginByToken(path: string, formObj: any = {}): Promise<ReturnObject> {
     const postData = {};
     const salt = Date.now();
     formObj = _.cloneDeep(formObj);
@@ -247,5 +255,4 @@ const buildResObj = (arg0?, arg1?, arg2?) => {
           });
     });
   }
-
 }

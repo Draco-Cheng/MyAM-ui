@@ -1,28 +1,26 @@
 import { Injectable } from '@angular/core';
 
+import * as _ from 'lodash';
+
 import defaultConf from '../config.json';
 
-let config = defaultConf;
-
-function cloneObj(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
+let config: Config = defaultConf;
 
 @Injectable() export class ConfigHandler {
 
-  get(name ? ) {
+  get(name?): string | Config {
     return name ? config[name] : config;
   }
 
-  set(name, data) {
-    const newConfig = cloneObj(config);
-    newConfig[name] = typeof data === 'object' ? cloneObj(data) : data;
+  set(name: string, data: any): void {
+    const newConfig = _.cloneDeep(config);
+    newConfig[name] = typeof data === 'object' ? _.cloneDeep(data) : data;
 
     config['legacy'] = true;
     config = newConfig;
   }
 
-  setUserProfile(userProfile) {
+  setUserProfile(userProfile: UserDataForConfig): void {
     this.set('user', userProfile);
     this.set('uid', userProfile['uid']);
     this.set('isLogin', true);
