@@ -7,8 +7,8 @@ import defaultConf from '../config.json';
 let config: Config = defaultConf;
 
 @Injectable() export class ConfigHandler {
-
-  get(name?): string | Config {
+  // Why use 'any'? There is too many different type under the Config
+  get(name?): any {
     return name ? config[name] : config;
   }
 
