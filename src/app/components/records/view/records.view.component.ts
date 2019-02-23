@@ -56,21 +56,21 @@ export class RecordsViewComponent implements OnInit {
   private __meta = {};
 
   @ViewChild('showMoreBtn') showMoreBtn: ElementRef;
-  @ViewChild('recordSummarizeTypeFlat') recordSummarizeTypeFlat;
-  @ViewChild('recordSummarizeTypePieChart') recordSummarizeTypePieChart;
-  @ViewChild('recordSummarizeLineChart') recordSummarizeLineChart;
+  @ViewChild('recordSummarizeTypeFlat') recordSummarizeTypeFlat: SummerizeChild;
+  @ViewChild('recordSummarizeTypePieChart') recordSummarizeTypePieChart: SummerizeChild;
+  @ViewChild('recordSummarizeLineChart') recordSummarizeLineChart: SummerizeChild;
 
   private loading = false;
-  private records;
-  private records_pool = [];
+  private records: RecordNode[];
+  private records_pool: RecordNode[] = [];
   private records_push_number = 25;
-  private records_index;
+  private records_index: number;
 
-  private typeSummerize;
-  private daySummerize;
+  private typeSummerize: SummerizeByType;
+  private daySummerize: DailySummerize[];
 
   private showTypeMap;
-  private qureyCondition = {
+  private qureyCondition: RecordQueryCondition = {
     cashType: 0,
     cid: null,
     start_date: formatDate(Date.now() - 1000 * 60 * 60 * 24 * 60),
@@ -92,13 +92,13 @@ export class RecordsViewComponent implements OnInit {
     private summarizeService: SummarizeService
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getRecord();
     __componentThis = this;
     this.__isInit = true;
   }
 
-  async getRecord() {
+  async getRecord(): Promise<void> {
     this.__meta['records'] = await this.recordsService.get(this.qureyCondition);
     this.records_pool = this.__meta['records']['data'] || [];
     this.records = [];
@@ -117,29 +117,29 @@ export class RecordsViewComponent implements OnInit {
 
   }
 
-  lazyPushRecords() {
+  lazyPushRecords(): void {
     this.records.push(...(this.records_pool.slice(this.records_index, this.records_index + this.records_push_number)));
     this.records_index = this.records_index + this.records_push_number;
   }
 
-  getSelectionCallback = cid => {
+  getSelectionCallback = (cid: Cid): void => {
     this.qureyCondition.cid = cid;
   }
 
-  getQureyConditionTidsArr() {
-    return _.map(this.qureyConditionTidsObj, (val, key) => {
+  getQureyConditionTidsArr(): { tid: Tid, label: string }[] {
+    return _.map(this.qureyConditionTidsObj, (val: string, key: Tid) => {
       return { tid: key, label: val };
     });
   }
 
-  conditionChange() {
+  conditionChange(): void {
     this.loading = true;
     this.buildQureyConditionTidsArr()
       .then(() => this.getRecord())
       .then(() => this.loading = false);
   }
 
-  async buildQureyConditionTidsArr() {
+  async buildQureyConditionTidsArr(): Promise<void> {
     const tidsList = Object.keys(this.qureyConditionTidsObj);
     const arr = [];
 
@@ -152,7 +152,7 @@ export class RecordsViewComponent implements OnInit {
     this.qureyCondition['tids_json'] = arr.length ? JSON.stringify(arr) : null;
   }
 
-  typeMapCallback = async (tid, label) => {
+  typeMapCallback = async (tid: Tid, label: string): Promise<void> => {
     if (!tid) {
       this.showTypeMap = false;
       this.conditionChange();
@@ -166,24 +166,24 @@ export class RecordsViewComponent implements OnInit {
     }
   }
 
-  removeQureyConditionTids(tid) {
+  removeQureyConditionTids(tid: Tid): void {
     delete this.qureyConditionTidsObj[tid];
     this.conditionChange();
   }
 
-  showMoreRecord() {
+  showMoreRecord(): void {
     this.lazyPushRecords();
   }
 
-  scrollToTop() {
+  scrollToTop(): void {
     document.scrollingElement.scrollTop = 0;
   }
 
-  putTypeSummerizeToDirective = () => {
+  putTypeSummerizeToDirective = (): SummerizeByType => {
     return this.typeSummerize;
   }
 
-  putDaySummerizeToDirective = () => {
+  putDaySummerizeToDirective = (): DailySummerize[] => {
     return this.daySummerize;
   }
 }

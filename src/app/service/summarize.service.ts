@@ -36,7 +36,7 @@ import { CurrencyService } from './currency.service';
     return daySummerize;
   }
 
-  async buildTypeSummerize(records) {
+  async buildTypeSummerize(records): Promise<SummerizeByType> {
     const typeService = this.typeService;
     const currencyService = this.currencyService;
     const defaultCid = currencyService.getDefaultCid();
@@ -126,7 +126,7 @@ import { CurrencyService } from './currency.service';
     typeSummerize['sum']['sum'] = sumEarn - sumCost;
     typeSummerize['sum']['count'] = sumCount;
 
-    return typeSummerize;
+    return <SummerizeByType>typeSummerize;
   }
 
 

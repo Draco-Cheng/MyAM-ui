@@ -1,4 +1,4 @@
-type Tid = '_unclassified' | string;
+type Tid = '_unclassified' | string | number;
 
 interface TypeNode {
   cashType: number,

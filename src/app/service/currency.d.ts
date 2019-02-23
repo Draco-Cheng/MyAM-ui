@@ -27,3 +27,12 @@ interface CurrencyNode {
 interface CurrencyMap {
   [cid: string]: CurrencyNode
 }
+
+
+interface CurrencyExchangeItem {
+    value: number;
+    track: Cid[];
+    precise_value: number;
+    precise_track: Cid[];
+    type: Cid
+}

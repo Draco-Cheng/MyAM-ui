@@ -58,7 +58,7 @@ import { NotificationHandler } from '../handler/notification.handler';
     return resault;
   }
 
-  async setType(rid: string, tids) {
+  async setType(rid: RecordId, tids: Tid[]) {
     const url = this.endpoint + '/setTypes';
     const data = {
       rid: rid,

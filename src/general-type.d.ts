@@ -8,3 +8,12 @@ declare module "*.json" {
 type Date_YYYYMMDD = string;
 
 type TimeStamp = string | number;
+
+interface SummerizeChild {
+  buildSummerize: () => void
+}
+
+interface IsChangeViewItem {
+  status: string;
+  isChange: boolean;
+}

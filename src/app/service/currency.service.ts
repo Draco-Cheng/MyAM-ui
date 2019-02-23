@@ -191,7 +191,7 @@ let currencyMapForExchangeMemoryCache = null;
     this.config.set('cid', cid);
   }
 
-  exchange(sCid, tCid, value) {
+  exchange(sCid, tCid, value): CurrencyExchangeItem {
 
     sCid = (sCid || this.getDefaultCid()).toString();
     tCid = (tCid || this.getDefaultCid()).toString();
@@ -200,7 +200,8 @@ let currencyMapForExchangeMemoryCache = null;
     const currencyMapForExchangeCache = currencyMapForExchangeMemoryCache;
 
     if (!currencyMapForExchangeCache) {
-      return console.error('[currency.exchange] currencyMapForExchangeCache not ready... please get currency map first!');
+      console.error('[currency.exchange] currencyMapForExchangeCache not ready... please get currency map first!');
+      return;
     }
 
     if (!currencyExchangeCache[sCid] || !currencyExchangeCache[sCid][tCid]) {

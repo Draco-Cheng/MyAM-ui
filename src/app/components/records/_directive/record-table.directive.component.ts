@@ -4,6 +4,10 @@ import { RecordsService } from '../../../service/records.service';
 import { TypeService } from '../../../service/type.service';
 import { CurrencyService } from '../../../service/currency.service';
 
+interface RecordTableItem extends RecordNode, IsChangeViewItem {
+  currencyExhange: CurrencyExchangeItem;
+}
+
 @Component({
   selector: 'records-table',
   templateUrl: './record-table.template.html',
@@ -15,19 +19,18 @@ import { CurrencyService } from '../../../service/currency.service';
   ]
 })
 
-
 export class RecordTableDirectiveComponent implements OnInit {
   @Input() records: any;
 
   public __isInit = false;
   private __meta = {};
 
-  private types;
-  private typesFlat = {};
+  private types: TypeNode[];
+  private typesFlat: TypeFlat = {};
 
-  private currencyFlatMap;
-  private defaultCid;
-  private defaultCurrencyType;
+  private currencyFlatMap: CurrencyMap;
+  private defaultCid: Cid;
+  public defaultCurrencyType: CurrencyType;
 
   constructor(
     private recordsService: RecordsService,
@@ -35,18 +38,18 @@ export class RecordTableDirectiveComponent implements OnInit {
     private currencyService: CurrencyService
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     await this.getTypes();
     await this.getCurrency();
     this.__isInit = true;
   }
-  async __checkDataUpToDate() {
+  async __checkDataUpToDate(): Promise<void> {
     if (this.__meta['types']['legacy']) {
       await this.getTypes();
     }
   }
 
-  async getCurrency() {
+  async getCurrency(): Promise<void> {
     // only check currency on initial ready
     const _currencyMap = await this.currencyService.getMap();
     this.currencyFlatMap = _currencyMap['data']['flatMap'];
@@ -54,7 +57,7 @@ export class RecordTableDirectiveComponent implements OnInit {
     this.defaultCurrencyType = this.cidToCtype(this.defaultCid);
   }
 
-  async getTypes() {
+  async getTypes(): Promise<void> {
     this.__meta['types'] = await this.typeService.get();
     this.types = this.__meta['types']['data'];
 
@@ -63,35 +66,35 @@ export class RecordTableDirectiveComponent implements OnInit {
     });
   }
 
-  ObjKey(obj) {
+  ObjKey(obj: object): string[] {
     return Object.keys(obj);
   }
 
-  tidToLabel(tid: string) {
+  tidToLabel(tid: Tid): string {
     if (this.typesFlat[tid]) {
       return this.typesFlat[tid].type_label;
     }
 
     console.warn('Type missing', tid);
-    return tid;
+    return <string>tid;
   }
 
-  cidToCtype(cid) {
+  cidToCtype(cid: Cid): CurrencyType {
     return this.currencyFlatMap[cid]['type'];
   }
 
-  removeTypeInRecord(record, tid) {
+  removeTypeInRecord(record: RecordTableItem, tid: Tid): void {
     delete record.tidsObjMap[tid];
     this.recordChange(record);
   }
 
-  recordChange(record) {
+  recordChange(record: RecordTableItem): void {
     record.isChange = true;
   }
 
-  getRecordTypeMapSwitch(record) {
+  getRecordTypeMapSwitch(record: RecordTableItem): (tid: Tid) => void {
     const self = this;
-    return (tid) => {
+    return (tid: Tid): void => {
       if (record.tidsObjMap[tid]) {
         delete record.tidsObjMap[tid];
       } else {
@@ -101,14 +104,14 @@ export class RecordTableDirectiveComponent implements OnInit {
     };
   }
 
-  getSelectionCallback(record) {
-    return cid => {
+  getSelectionCallback(record: RecordTableItem): (cid: Cid) => void {
+    return (cid: Cid): void => {
       record.cid = cid;
       this.recordChange(record);
     };
   }
 
-  async saveRecord(record) {
+  async saveRecord(record: RecordTableItem): Promise<void> {
 
     const _resault1 = await this.recordsService.set(record);
     const _resault2 = await this.recordsService.setType(record.rid, Object.keys(record.tidsObjMap));
@@ -118,7 +121,7 @@ export class RecordTableDirectiveComponent implements OnInit {
     }
   }
 
-  async delRecord(record) {
+  async delRecord(record: RecordTableItem): Promise<void> {
     const _resault = await this.recordsService.del(record);
     if (_resault['data']) {
       record.status = 'removed';
@@ -127,7 +130,7 @@ export class RecordTableDirectiveComponent implements OnInit {
     }
   }
 
-  async reAdd(record) {
+  async reAdd(record: RecordTableItem): Promise<void> {
     const _resault = await this.recordsService.set(record);
     record.rid = _resault['data'][0].rid;
     const _resault2 = await this.recordsService.setType(record.rid, Object.keys(record.tidsObjMap));
@@ -137,12 +140,12 @@ export class RecordTableDirectiveComponent implements OnInit {
     }
   }
 
-  currencyExchange(record) {
+  currencyExchange(record: RecordTableItem): boolean {
     record.currencyExhange = this.currencyService.exchange(record.cid, this.defaultCid, record.value);
     return true;
   }
 
-  roundPrice(num) {
+  roundPrice(num: number): number {
     if (num === 0) {
       return 0;
     }
