@@ -3,6 +3,14 @@ import * as _ from 'lodash';
 
 import { TypeService } from '../../../service/type.service';
 
+interface RemoveableTypeNode extends TypeNode {
+  isRemoved: boolean;
+}
+
+interface RemoveableTypeFlat {
+  [tid: string]: RemoveableTypeNode;
+}
+
 @Component({
   selector: '[type-map-edit]',
   templateUrl: './type-map-edit.template.html',
@@ -15,36 +23,36 @@ export class TypeMapEditDirectiveComponent implements OnInit {
   // Note for who want to use this module
   // -------------------------------------
   // neceesary input
-  @Input() typesFlat?: Object;
-  @Input() typesMapFlatMeta?: Object;
+  @Input() typesFlat?: RemoveableTypeFlat;
+  @Input() typesMapFlatMeta?: CacheEle<TypeMapFlat>;
   // *************************************
   // internal input
-  @Input() parentNodes?: string;
-  @Input() currentNode?: number | string;
+  @Input() parentNodes?: string; // tid, tid, tid...
+  @Input() currentNode?: Tid;
   // *************************************
 
-  public childNode;
-  private showParentSelectPopOut;
-  private disabledTids = {};
+  public childNode: TypeNode[];
+  private showParentSelectPopOut: boolean;
+  private disabledTids: TypeFlatMap = {};
 
   constructor(
     private typeService: TypeService
   ) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.parentNodes = this.parentNodes || '';
     this.currentNode && (this.parentNodes += this.currentNode + ',');
     this.disabledTids[this.currentNode] = true;
     this.getChildNode();
   }
-  __checkDataUpToDate() {
+  __checkDataUpToDate(): boolean {
     if (this.typesMapFlatMeta['legacy']) {
       this.getChildNode();
     }
     return true;
   }
 
-  getChildNode() {
+  getChildNode(): void {
     const parentNodes = this.parentNodes;
     const currentNode = this.currentNode;
     const typesFlat = this.typesFlat;
@@ -86,7 +94,7 @@ export class TypeMapEditDirectiveComponent implements OnInit {
     }
   }
 
-  getNodeParents(currentNode) {
+  getNodeParents(currentNode: Tid): Tid[] {
     const typesFlat = this.typesFlat;
     const typesMapFlat = this.typesMapFlatMeta['data'];
     const list = [];
@@ -99,7 +107,7 @@ export class TypeMapEditDirectiveComponent implements OnInit {
     return list;
   }
 
-  getNodeParentsMap() {
+  getNodeParentsMap(): TypeMapNode {
     const typesMapFlat = this.typesMapFlatMeta['data'];
     const currentNode = this.currentNode;
 
@@ -110,15 +118,16 @@ export class TypeMapEditDirectiveComponent implements OnInit {
     }
   }
 
-  getTypeMapCallback() {
+  getTypeMapCallback(): (tid: Tid) => Promise<void> {
     const self = this;
     const typesMapFlat = self.typesMapFlatMeta['data'];
     const currentNode = self.currentNode;
     const typesFlat = self.typesFlat;
 
-    return async tid => {
+    return async (tid: Tid): Promise<void> => {
       if (!tid) {
-        return self.showParentSelectPopOut = false;
+        self.showParentSelectPopOut = false;
+        return;
       }
 
       if (typesMapFlat[currentNode] && typesMapFlat[currentNode]['parents'].hasOwnProperty(tid)) {
@@ -129,24 +138,24 @@ export class TypeMapEditDirectiveComponent implements OnInit {
     };
   }
 
-  async save(node) {
+  async save(node: TypeNode & IsChangeViewItem): Promise<void> {
     await this.typeService.set(node);
     node.isChange = false;
   }
 
-  async unlinkParant(p_tid) {
+  async unlinkParant(p_tid: Tid): Promise<void> {
     if (p_tid !== this.currentNode) {
       await this.typeService.unlinkParant(p_tid, this.currentNode);
     }
   }
 
-  async linkParant(p_tid) {
+  async linkParant(p_tid: Tid): Promise<void> {
     if (p_tid !== this.currentNode) {
       await this.typeService.linkParant(p_tid, this.currentNode);
     }
   }
 
-  async del() {
+  async del(): Promise<void> {
     await this.typeService.del(this.currentNode);
     this.typesFlat[this.currentNode].isRemoved = true;
   }

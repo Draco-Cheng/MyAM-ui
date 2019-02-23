@@ -52,7 +52,7 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
       if (typesMapFlat[currentNode] && typesMapFlat[currentNode]['childs']) {
         Object.keys(typesMapFlat[currentNode]['childs'])
           .forEach((tid: Tid) => {
-            typesFlat[tid].showInMap && parentNodes.indexOf(tid) === -1 && childNodes.push(tid);
+            typesFlat[tid].showInMap && parentNodes.indexOf(<string>tid) === -1 && childNodes.push(tid);
           });
       }
     } else {

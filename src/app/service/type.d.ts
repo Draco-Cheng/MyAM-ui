@@ -1,7 +1,7 @@
 type Tid = '_unclassified' | string | number;
 
 interface TypeNode {
-  cashType: number,
+  cashType: CashType,
   master: number,
   quickSelect: number,
   showInMap: number,

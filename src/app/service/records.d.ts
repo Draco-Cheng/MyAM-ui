@@ -1,10 +1,8 @@
-type RecordType = -1 | 0 | 1; // -1 = Cost, 1 = Earn, 0 = Both (For query)
-
 type RecordId = TimeStamp;
 
 
 interface RecordNode {
-  cashType: RecordType;
+  cashType: CashType;
   cid: Cid;
   date: Date_YYYYMMDD;
   memo: string;
@@ -17,7 +15,7 @@ interface RecordNode {
 type RecordQueryOrderBy = ['rid' | 'date', 'ASC' | 'DESC'];
 
 interface RecordQueryCondition {
-  cashType: RecordType;
+  cashType: CashType;
   cid: Cid;
   end_date: Date_YYYYMMDD;
   limit: '' | number;
