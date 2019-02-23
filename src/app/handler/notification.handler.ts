@@ -13,7 +13,7 @@ const callbackPool = {};
     _keys.forEach(key => callbackPool[key](type, msg));
   }
 
-  registCallback(callback: Function) {
+  registCallback(callback: Function): TimeStamp {
     const time = Date.now();
     callbackPool[time] = callback;
     return time;

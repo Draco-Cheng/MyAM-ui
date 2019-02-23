@@ -13,38 +13,38 @@ import { AuthService } from '../../service/auth.service';
   ]
 })
 export class NavComponent implements OnInit {
-  private name = 'MyAM';
   private __meta = {};
   public __isInit;
 
-  private user;
-  private isLogin;
-  private database;
+  public user: UserDataForConfig;
+  public isLogin: boolean;
+  public database: string;
+  public pageTitle = 'MyAM';
 
   constructor(
     private profileService: ProfileService,
     private authService: AuthService
   ) {}
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.getConfig();
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() {
+  async __checkDataUpToDate(): Promise<void> {
     if (this.__meta['config']['legacy']) {
       this.getConfig();
     }
   }
 
-  getConfig() {
-    const config = this.__meta['config'] = this.profileService.getConfig();
+  getConfig(): void {
+    const config: Config = this.__meta['config'] = this.profileService.getConfig();
     this.user = config['user'];
     this.isLogin = config['isLogin'];
     this.database = config['database'];
   }
 
-  async logout() {
+  async logout(): Promise<void> {
     await this.authService.logout();
     location.href = '';
   }

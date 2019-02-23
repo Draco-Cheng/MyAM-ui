@@ -63,7 +63,7 @@ export class RecordsAddComponent implements OnInit {
   async ngOnInit() {
     await this.getRecord();
     await this.getTypes();
-    this.newRecord.cid = this.currencyService.getDefaultCid();
+    this.newRecord.cid = <string>this.currencyService.getDefaultCid();
     this.__isInit = true;
   }
 

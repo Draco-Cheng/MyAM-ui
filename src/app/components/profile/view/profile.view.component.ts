@@ -4,6 +4,12 @@ import * as _ from 'lodash';
 
 import { ProfileService } from '../../../service/profile.service';
 
+interface BreakpointDb {
+  dbName: string;
+}
+
+type DbName = string;
+
 @Component({
   selector: 'app-profile-content',
   templateUrl: './profile.view.template.html',
@@ -17,18 +23,18 @@ export class ProfileViewComponent implements OnInit {
   public __isInit = false;
   private __meta = {};
 
-  private user;
-  private activedDb;
-  private selectedDb;
-  private breakpointDbList;
-  private profileMap;
-  private popOutAddDb;
-  private dbName;
-  private changeDbName;
+  private user: UserDataForConfig;
+  private activedDb: DbName;
+  private selectedDb: DbName;
+  private breakpointDbList: BreakpointDb[];
+  private profileMap: ProfileMap;
+  public popOutAddDb: boolean;
+  private dbName: DbName;
+  private changeDbName: boolean;
 
-  private pwd_original;
-  private pwd_new;
-  private pwd_confirm;
+  private pwd_original: string;
+  private pwd_new: string;
+  private pwd_confirm: string;
 
 
   constructor(
@@ -37,7 +43,7 @@ export class ProfileViewComponent implements OnInit {
     this.profileMap = this.profileService.getProfileMap();
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.getConfig();
 
     if (this.user['status'] >= 20) {
@@ -51,24 +57,24 @@ export class ProfileViewComponent implements OnInit {
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() {
+  __checkDataUpToDate(): void {
     if (this.__meta['config']['legacy']) {
       this.getConfig();
     }
   }
 
-  getConfig() {
+  getConfig(): void {
     this.__meta['config'] = this.profileService.getConfig();
-    const config = _.cloneDeep(this.__meta['config']);
+    const config: Config = _.cloneDeep(this.__meta['config']);
     this.user = config['user'];
     this.activedDb = config['database'];
   }
 
-  formatDate(date) {
-    return new Date(date * 1).toDateString();
+  formatDate(date: TimeStamp): string {
+    return new Date(date).toDateString();
   }
 
-  async setSelectDb(db ? ) {
+  async setSelectDb(db?: DbName): Promise<void> {
     this.getConfig();
     this.selectedDb = db || this.user['dbList'][0];
     this.dbName = this.selectedDb;
@@ -77,17 +83,17 @@ export class ProfileViewComponent implements OnInit {
     this.selectedDb && await this.getBreakpointDbList();
   }
 
-  async getBreakpointDbList() {
+  async getBreakpointDbList(): Promise<void> {
     if (this.selectedDb) {
       const res = await this.profileService.getBreakpointDbList(this.selectedDb);
-      const list = < any[] > res['data'];
+      const list = <DbName[]>res['data'];
       this.breakpointDbList = [];
 
       list.forEach(name => this.breakpointDbList.push({ 'dbName': name }));
     }
   }
 
-  async delDB(dbName) {
+  async delDB(dbName: DbName): Promise<void> {
     const msg = `Are you sure, you want to delete database: ${dbName}?\nPlease Enter: "${dbName}" to confirm!`;
     if (prompt(msg) === dbName) {
       await this.profileService.delDB(dbName);
@@ -100,14 +106,14 @@ export class ProfileViewComponent implements OnInit {
     }
   }
 
-  async delBreakpointDb(breakpointDb) {
+  async delBreakpointDb(breakpointDb: DbName): Promise<void> {
     if (this.selectedDb) {
       await this.profileService.delBreakpointDb(this.selectedDb, breakpointDb);
       this.getBreakpointDbList();
     }
   }
 
-  closeAddDbPopOut = (dbName ? ) => {
+  closeAddDbPopOut = (dbName?: DbName): void => {
     if (dbName) {
       this.setSelectDb(dbName);
       this.setActiveDb();
@@ -116,20 +122,20 @@ export class ProfileViewComponent implements OnInit {
     this.popOutAddDb = false;
   }
 
-  openAddDbPopOut() {
+  openAddDbPopOut(): void {
     this.popOutAddDb = true;
   }
 
-  setActiveDb() {
+  setActiveDb(): void {
     this.profileService.setActiveDb(this.selectedDb);
     this.activedDb = this.selectedDb;
   }
 
-  downloadDb(breakpointDb) {
+  downloadDb(breakpointDb: DbName): void {
     this.profileService.downloadDb(this.selectedDb, breakpointDb);
   }
 
-  async renameDb() {
+  async renameDb(): Promise<void> {
     const resault = await this.profileService.renameDb(this.selectedDb, this.dbName);
     if (resault['success']) {
       await this.setSelectDb(this.dbName);
@@ -138,7 +144,7 @@ export class ProfileViewComponent implements OnInit {
 
   }
 
-  async save() {
+  async save(): Promise<void> {
     const data = {};
     data['name'] = this.user['name'];
     data['mail'] = this.user['mail'];

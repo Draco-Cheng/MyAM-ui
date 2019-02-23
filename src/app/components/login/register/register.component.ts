@@ -25,11 +25,13 @@ export class RegisterComponent {
     mail: ''
   };
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     if (this.form['pwd'] !== this.form['pwd2']) {
       return;
     }
 
     const _resault = await this.authService.register(this.form);
+
+    // TODO: handle error case
   }
 }

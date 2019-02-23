@@ -6,3 +6,5 @@ declare module "*.json" {
 
 // common type
 type Date_YYYYMMDD = string;
+
+type TimeStamp = string | number;

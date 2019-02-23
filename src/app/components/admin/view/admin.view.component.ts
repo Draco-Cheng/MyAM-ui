@@ -20,7 +20,7 @@ export class AdminViewComponent implements OnInit {
 
   public profileMap: ProfileMap;
 
-  private userList: UserData[];
+  private userList: UserDataForAdmin[];
 
   constructor(
     private profileService: ProfileService,
@@ -54,7 +54,7 @@ export class AdminViewComponent implements OnInit {
     return Object.keys(obj);
   }
 
-  async resetPwd(user: UserData): Promise<void> {
+  async resetPwd(user: UserDataForAdmin): Promise<void> {
     const data = {
       target_uid: user['uid'],
       newPwd: user['newPwd']
@@ -65,7 +65,7 @@ export class AdminViewComponent implements OnInit {
     user['newPwd'] = '';
   }
 
-  async updateUser(user: UserData): Promise<void> {
+  async updateUser(user: UserDataForAdmin): Promise<void> {
     const data = {
       target_uid: user['uid'],
       status: typeof user['status'] === 'string' ? _.parseInt(user['status']) : user['status'],

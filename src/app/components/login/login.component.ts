@@ -20,7 +20,7 @@ export class LoginComponent {
 
   public form = new LoginForm('', '', false);
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     await this.authService.login(this.form);
   }
 }

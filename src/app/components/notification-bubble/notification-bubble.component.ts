@@ -1,5 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
+type NotificationType = 'error' | 'warn' | 'success';
+
+interface NotificationItem {
+  type: NotificationType;
+  msg: string;
+}
+
 import {
   trigger,
   state,
@@ -36,31 +43,28 @@ import { NotificationHandler } from '../../handler/notification.handler';
 })
 export class NotificationBubbleComponent implements OnInit {
   public __isInit;
-  private __meta = {};
 
   public msgPool = [];
 
-  private notificationId;
+  private notificationId: TimeStamp;
 
   constructor(
     private notificationHandler: NotificationHandler
   ) { }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.notificationId = this.notificationHandler.registCallback(this.notificationCallback);
     this.__isInit = true;
   }
 
-  async __checkDataUpToDate() { }
-
-  notificationCallback = (type, msg) => {
-    const item = { type: type, msg: msg };
+  notificationCallback = (type: NotificationType, msg: string): void => {
+    const item: NotificationItem = { type: type, msg: msg };
     this.msgPool.unshift(item);
 
     setTimeout(() => this.msgPool.pop(), type === 'error' ? 5000 : 3000);
   }
 
-  remove(item) {
+  remove(item: NotificationItem): void {
     this.msgPool.splice(this.msgPool.indexOf(item), 1);
   }
 }
