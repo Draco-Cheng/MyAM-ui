@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { TypeService } from '../../../service/type.service';
+import * as _ from 'lodash';
+
+import { TypeService, ChildsList } from '../../../service/type.service';
 import { SummarizeService } from '../../../service/summarize.service';
 
 import { NgxPieChartConf } from './ngx-pie-chart-conf';
@@ -74,10 +76,7 @@ export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
 
     let typeListChild: Tid[];
     let typeListUnclassified: Tid[];
-    let childsList: {
-      childs: Tid[];
-      unclassified: Tid[];
-    };
+    let childsList: ChildsList;
     let showTypeNone: boolean;
     switch (this.typeIdSelected) {
       case 'OVERVIEW':
@@ -91,7 +90,7 @@ export class RecordSummarizeTypePieChartDirectiveComponent implements OnInit {
         typeListChild = childsList['unclassified'];
         break;
       default:
-        childsList = await this.typeService.getChildsInNextLayer(parseInt(this.typeIdSelected, 10), true);
+        childsList = await this.typeService.getChildsInNextLayer(this.typeIdSelected, true);
         typeListChild = childsList['childs'];
         break;
     }

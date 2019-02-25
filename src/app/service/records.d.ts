@@ -7,7 +7,7 @@ interface RecordNode {
   date: Date_YYYYMMDD;
   memo: string;
   rid: RecordId;
-  tids: Tid[] | TypeFlatMap; // TypeFlatMap only for the new record
+  tids: string | Tid[] | TypeFlatMap; // TypeFlatMap only for the new record
   tidsObjMap: TypeFlatMap;
   value: number;
 }

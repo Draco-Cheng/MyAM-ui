@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import * as _ from 'lodash';
 
-import { ProfileService } from '../../../service/profile.service';
+import { ProfileService, SetProfileFormData } from '../../../service/profile.service';
 
 interface BreakpointDb {
   dbName: string;
@@ -57,10 +57,11 @@ export class ProfileViewComponent implements OnInit {
     this.__isInit = true;
   }
 
-  __checkDataUpToDate(): void {
+  __checkDataUpToDate(): boolean {
     if (this.__meta['config']['legacy']) {
       this.getConfig();
     }
+    return true;
   }
 
   getConfig(): void {
@@ -145,11 +146,11 @@ export class ProfileViewComponent implements OnInit {
   }
 
   async save(): Promise<void> {
-    const data = {};
-    data['name'] = this.user['name'];
-    data['mail'] = this.user['mail'];
-    data['breakpoint'] = this.user['breakpoint'];
-
+    const data: SetProfileFormData = {
+      name: this.user['name'],
+      mail: this.user['mail'],
+      breakpoint: this.user['breakpoint']
+    };
 
     if (this.pwd_original && this.pwd_new && this.pwd_new === this.pwd_confirm) {
       data['pwd'] = this.pwd_original;

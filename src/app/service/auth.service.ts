@@ -12,12 +12,25 @@ import {
   RouterStateSnapshot
 } from '@angular/router';
 
+export interface LoginFormData {
+  acc: string;
+  pwd: string;
+  keep: boolean;
+}
+
+export interface RegistFormData {
+  name: string;
+  account: string;
+  pwd: string;
+  mail: string;
+  token?: string;
+}
 
 @Injectable() export class AuthService {
 
   private endpoint = '/auth';
 
-  private encrypt;
+  private encrypt: (str: string) => string;
 
   constructor(
     private router: Router,
@@ -30,7 +43,7 @@ import {
   }
 
 
-  async login(formObj: any) {
+  async login(formObj: LoginFormData): Promise<void> {
     const url = this.endpoint + '/login';
     console.log('[AuthService] login:', formObj['acc']);
 
@@ -44,7 +57,7 @@ import {
     }
   }
 
-  async loginByToken() {
+  async loginByToken(): Promise<boolean> {
     const url = this.endpoint + '/login';
     const loginInfo = localStorage.getItem('token').split(',');
     const res = await this.request.loginByToken(url, { uid: loginInfo[0], token: loginInfo[1] });
@@ -57,7 +70,7 @@ import {
     return !!res['success'];
   }
 
-  async logout() {
+  async logout(): Promise<void> {
     const url = this.endpoint + '/logout';
     console.log('[AuthService] logout');
 
@@ -68,7 +81,7 @@ import {
     }
   }
 
-  async register(formObject) {
+  async register(formObject: RegistFormData): Promise<ReturnObject<any>> {
     const url = this.endpoint + '/register';
 
     const data = {};
@@ -103,11 +116,11 @@ import {
     private request: RequestHandler,
     private authService: AuthService,
     private notificationHandler: NotificationHandler
-  ) {}
+  ) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     console.log('AuthGuard#canActivate called');
-    return new Promise(async(resolve: Function, reject: Function) => {
+    return new Promise(async (resolve: Function) => {
 
       if (this.config.get('isLogin')) {
         return resolve(true);

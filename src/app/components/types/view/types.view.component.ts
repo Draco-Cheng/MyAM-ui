@@ -8,7 +8,7 @@ interface NewTypeNode {
   master: boolean;
   showInMap: boolean;
   quickSelect: boolean;
-  parents: TypeFlatMap;
+  parents:  TypeFlatMap;
 }
 
 @Component({
@@ -82,7 +82,7 @@ export class TypesViewComponent implements OnInit {
 
   getTypeMapCallback(): (tid: Tid) => Promise<void> {
     const self = this;
-    const newTypeParents: TypeFlatMap = self.newType.parents;
+    const newTypeParents = self.newType.parents;
 
     return async (tid: Tid): Promise<void> => {
       if (!tid) {

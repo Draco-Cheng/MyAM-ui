@@ -7,6 +7,21 @@ import { NotificationHandler } from '../handler/notification.handler';
 
 import currencyList from './currency.list.json';
 
+export interface SetCurrencyFormData {
+  cid?: Cid;
+  type: CurrencyType;
+  rate: number;
+  to_cid: Cid;
+  memo: string;
+  quickSelect: boolean;
+  date: Date_YYYYMMDD;
+  main: boolean;
+}
+
+export interface SetCurrencyResponse {
+  cid: Cid;
+}
+
 const currencyExchangeMemoryCache = {};
 let currencyMapForExchangeMemoryCache = null;
 
@@ -24,12 +39,12 @@ let currencyMapForExchangeMemoryCache = null;
     this.getMap();
   }
 
-  wipe() {
+  wipe(): void {
     this.cacheHandler.wipe('currency');
     this.cacheHandler.wipe('currency.map');
   }
 
-  setConfigCid(defaultCid, flatMap) {
+  setConfigCid(defaultCid: Cid, flatMap: CurrencyMap) {
     const uid = this.config.get('uid');
     const localCid = localStorage.getItem(uid + '.cid');
     if (localCid && flatMap[localCid]) {
@@ -44,11 +59,11 @@ let currencyMapForExchangeMemoryCache = null;
     return this.config.get('cid');
   }
 
-  getCurrencyList() {
+  getCurrencyList(): CurrencyType[] {
     return this.currencyList;
   }
 
-  async get(formObj?: any) {
+  async get(): Promise<CacheEle<CurrencyNode[]>> {
     const cacheName = 'currency';
     const cache = await this.cacheHandler.get(cacheName, true);
     if (cache.status === 1) {
@@ -67,7 +82,7 @@ let currencyMapForExchangeMemoryCache = null;
   }
 
 
-  async getMap() {
+  async getMap(): Promise<CacheEle<CurrencyMaps>> {
     const cacheName = 'currency.map';
     const cache = await this.cacheHandler.get(cacheName, true);
 
@@ -77,7 +92,7 @@ let currencyMapForExchangeMemoryCache = null;
       const resolveCache = this.cacheHandler.regAsyncReq(cacheName);
       const currency = (await this.get())['data'];
       const structureMap = {};
-      const flatMap = {};
+      const flatMap: CurrencyMap = {};
       let rootCid;
 
       // build flate map
@@ -118,7 +133,7 @@ let currencyMapForExchangeMemoryCache = null;
     }
   }
 
-  async set(formObj: any) {
+  async set(formObj: SetCurrencyFormData): Promise<ReturnObject<SetCurrencyResponse>> {
     const url = this.endpoint + '/set';
     const data = {
       cid: formObj.cid,
@@ -132,7 +147,7 @@ let currencyMapForExchangeMemoryCache = null;
     };
 
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SetCurrencyResponse>(url, data);
 
     if (resault['success']) {
       this.wipe();
@@ -144,7 +159,7 @@ let currencyMapForExchangeMemoryCache = null;
     return resault;
   }
 
-  async add(formObj: any) {
+  async add(formObj: SetCurrencyFormData): Promise<ReturnObject<SetCurrencyResponse>> {
     const url = this.endpoint + '/set';
     const data = {
       type: formObj.type,
@@ -156,7 +171,7 @@ let currencyMapForExchangeMemoryCache = null;
       main: formObj.main
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SetCurrencyResponse>(url, data);
 
     if (resault['success']) {
       this.wipe();
@@ -168,13 +183,13 @@ let currencyMapForExchangeMemoryCache = null;
     return resault;
   }
 
-  async del(del_cid) {
+  async del(del_cid: Cid): Promise<ReturnObject<null>> {
     const url = this.endpoint + '/del';
     const data = {
       del_cid: del_cid
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<null>(url, data);
 
     if (resault['success']) {
       this.wipe();
@@ -191,7 +206,7 @@ let currencyMapForExchangeMemoryCache = null;
     this.config.set('cid', cid);
   }
 
-  exchange(sCid, tCid, value): CurrencyExchangeItem {
+  exchange(sCid: Cid, tCid: Cid, value: number): CurrencyExchangeItem {
 
     sCid = (sCid || this.getDefaultCid()).toString();
     tCid = (tCid || this.getDefaultCid()).toString();

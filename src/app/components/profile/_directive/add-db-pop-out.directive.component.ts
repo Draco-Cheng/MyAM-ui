@@ -4,7 +4,7 @@ import { Component, Input } from '@angular/core';
 import { ProfileService } from '../../../service/profile.service';
 import { CurrencyService } from '../../../service/currency.service';
 
-type Callback = (dataBaseName: string) => void;
+type Callback = (dataBaseName?: string) => void;
 
 @Component({
   selector: '[app-add-db-pop-out]',

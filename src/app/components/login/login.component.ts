@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { LoginForm } from './login.form';
 
-import { AuthService } from '../../service/auth.service';
+import { AuthService, LoginFormData } from '../../service/auth.service';
 
 @Component({
   selector: 'app-content-mid-center',
@@ -18,7 +18,7 @@ export class LoginComponent {
     private router: Router
   ) { }
 
-  public form = new LoginForm('', '', false);
+  public form: LoginFormData = new LoginForm('', '', false);
 
   async onSubmit(): Promise<void> {
     await this.authService.login(this.form);

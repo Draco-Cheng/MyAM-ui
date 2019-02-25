@@ -5,9 +5,17 @@ import { RequestHandler } from '../handler/request.handler';
 import { CryptHandler } from '../handler/crypt.handler';
 import { NotificationHandler } from '../handler/notification.handler';
 
+export interface SetUserFormData {
+  target_uid: Uid;
+  newPwd?: string;
+  status?: Status;
+  permission?: Permission;
+  token?: string;
+}
+
 @Injectable() export class AdminServer {
   private endpoint = '/admin';
-  private encrypt;
+  private encrypt: (str: string) => string;
 
   constructor(
     private config: ConfigHandler,
@@ -18,12 +26,12 @@ import { NotificationHandler } from '../handler/notification.handler';
     this.encrypt = cryptHandler.encrypt;
   }
 
-  async getUserList() {
+  async getUserList(): Promise<ReturnObject<UserDataForAdmin[]>> {
 
     const url = this.endpoint + '/userList';
     const data = {};
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<UserDataForAdmin[]>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);
@@ -32,7 +40,7 @@ import { NotificationHandler } from '../handler/notification.handler';
     return resault;
   }
 
-  async setUser(formObj) {
+  async setUser(formObj: SetUserFormData): Promise<ReturnObject<UserDataForAdmin>> {
     const url = this.endpoint + '/setUser';
     const data = formObj;
 
@@ -41,7 +49,7 @@ import { NotificationHandler } from '../handler/notification.handler';
       delete data['newPwd'];
     }
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<UserDataForAdmin>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);

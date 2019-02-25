@@ -8,14 +8,7 @@ import { i18n } from '../i18n/i18n';
 import { ConfigHandler } from './config.handler';
 import { CryptHandler } from './crypt.handler';
 
-interface ReturnObject {
-  success: boolean;
-  code: string;
-  message: string;
-  data: any;
-}
-
-const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): ReturnObject => {
+const buildResObj = <T>(arg0?: number, arg1?: string | object, arg2?: object): ReturnObject<T> => {
   const obj = {
     success: null,
     code: null,
@@ -58,7 +51,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
     'Content-Type': 'application/json'
   });
 
-  async post(path: string, formObj: any = {}): Promise<ReturnObject> {
+  async post<T>(path: string, formObj: any = {}): Promise<ReturnObject<T>> {
     const data = _.cloneDeep(formObj);
     const salt = Date.now().toString();
 
@@ -73,7 +66,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
     this.headers.set('Auth-Token', this.encrypt(this.authTokenBase + salt));
 
     // <any[]> predefine resolve return value type
-    return new Promise<ReturnObject>((resolve, reject) => {
+    return new Promise<ReturnObject<T>>((resolve, reject) => {
       this.http.post(this.config.get('server_domain') + path, JSON.stringify(data), { headers: this.headers })
         .subscribe(
           responseData => resolve(buildResObj(responseData.status, responseData.json())),
@@ -101,7 +94,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
     window.URL.revokeObjectURL(url);
   }
 
-  async download(path: string, formObj: {}) {
+  async download(path: string, formObj: {}): Promise<ReturnObject<Blob>> {
     const salt = Date.now().toString();
 
     formObj['db'] = formObj['db'] || this.config.get('database');
@@ -124,7 +117,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
             _res = xhttp.response;
           }
 
-          resolve(buildResObj(xhttp.status, _res));
+          resolve(buildResObj<Blob>(xhttp.status, _res));
         }
       };
 
@@ -137,7 +130,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
     });
   }
 
-  async upload(path: string, formObj: {}): Promise<ReturnObject> {
+  async upload(path: string, formObj: {}): Promise<ReturnObject<any>> {
     const salt = Date.now().toString();
     const formData = new FormData();
 
@@ -178,7 +171,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
   }
 
 
-  async login(path: string, formObj: any = {}): Promise<ReturnObject> {
+  async login(path: string, formObj: any = {}): Promise<ReturnObject<any>> {
     const postData = {};
     const salt = Date.now();
     formObj = _.cloneDeep(formObj);
@@ -220,7 +213,7 @@ const buildResObj = (arg0?: number, arg1?: string | object, arg2?: object): Retu
     });
   }
 
-  async loginByToken(path: string, formObj: any = {}): Promise<ReturnObject> {
+  async loginByToken(path: string, formObj: any = {}): Promise<ReturnObject<any>> {
     const postData = {};
     const salt = Date.now();
     formObj = _.cloneDeep(formObj);

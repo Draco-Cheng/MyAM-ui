@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as _ from 'lodash';
 
-import { AdminServer } from '../../../service/admin.service';
+import { AdminServer, SetUserFormData } from '../../../service/admin.service';
 import { ProfileService } from '../../../service/profile.service';
 
 @Component({
@@ -55,7 +55,7 @@ export class AdminViewComponent implements OnInit {
   }
 
   async resetPwd(user: UserDataForAdmin): Promise<void> {
-    const data = {
+    const data: SetUserFormData = {
       target_uid: user['uid'],
       newPwd: user['newPwd']
     };
@@ -66,10 +66,10 @@ export class AdminViewComponent implements OnInit {
   }
 
   async updateUser(user: UserDataForAdmin): Promise<void> {
-    const data = {
+    const data: SetUserFormData = {
       target_uid: user['uid'],
-      status: typeof user['status'] === 'string' ? _.parseInt(user['status']) : user['status'],
-      permission: typeof user['permission'] === 'string' ? _.parseInt(user['permission']) : user['permission']
+      status: user['status'],
+      permission: user['permission']
     };
 
     const resault = await this.adminServer.setUser(data);

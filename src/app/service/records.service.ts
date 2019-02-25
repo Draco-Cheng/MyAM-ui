@@ -3,6 +3,21 @@ import { Injectable } from '@angular/core';
 import { RequestHandler } from '../handler/request.handler';
 import { NotificationHandler } from '../handler/notification.handler';
 
+interface SetRecordResponse {
+  [index: number]: {
+    rid: RecordId;
+  };
+}
+
+export interface SetRecordFormData {
+  rid: RecordId;
+  cashType: CashType;
+  cid: Cid;
+  value: number;
+  memo: string;
+  date: Date_YYYYMMDD;
+}
+
 @Injectable() export class RecordsService {
 
   constructor(
@@ -12,20 +27,20 @@ import { NotificationHandler } from '../handler/notification.handler';
 
   private endpoint = '/record'; // URL to web API
 
-  async get(formObj?: any) {
+  async get(formObj?: RecordQueryCondition): Promise<ReturnObject<RecordNode[]>> {
     const url = this.endpoint + '/get';
-    const data = formObj || { orderBy: ['rid', 'DESC'], limit: 10 };
+    const data = formObj || <RecordQueryCondition>{ orderBy: ['rid', 'DESC'], limit: 10 };
 
     if (typeof data.cashType === 'string') {
-      data.cashType = data.cashType * 1;
+      data.cashType = <CashType>(data.cashType * 1);
     }
 
-    const resault = <any[]>await this.request.post(url, data);
+    const resault = await this.request.post<RecordNode[]>(url, data);
 
     if (resault['success']) {
       resault['data'].forEach(record => {
         const map = {};
-        record.tids = record.tids ? record.tids.split(',') : [];
+        record.tids = (record.tids && typeof record.tids === 'string') ? record.tids.split(',') : [];
         record.tids.forEach(tid => map[tid] = true);
         record.tidsObjMap = map;
       });
@@ -36,7 +51,7 @@ import { NotificationHandler } from '../handler/notification.handler';
     return resault;
   }
 
-  async set(recordObj?: any) {
+  async set(recordObj?: SetRecordFormData): Promise<ReturnObject<SetRecordResponse>> {
     const url = this.endpoint + '/set';
     const data = {
       rid: recordObj.rid,
@@ -47,7 +62,7 @@ import { NotificationHandler } from '../handler/notification.handler';
       date: recordObj.date
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SetRecordResponse>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);
@@ -58,14 +73,14 @@ import { NotificationHandler } from '../handler/notification.handler';
     return resault;
   }
 
-  async setType(rid: RecordId, tids: Tid[]) {
+  async setType(rid: RecordId, tids: Tid[]): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint + '/setTypes';
     const data = {
       rid: rid,
       tids_json: tids
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SimpleMessageResponse>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);
@@ -74,13 +89,13 @@ import { NotificationHandler } from '../handler/notification.handler';
     return resault;
   }
 
-  async del(recordObj?: any) {
+  async del(recordObj?: { rid: RecordId }): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint + '/del';
     const data = {
       rid: recordObj.rid
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SimpleMessageResponse>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);

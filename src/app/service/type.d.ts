@@ -1,10 +1,10 @@
-type Tid = '_unclassified' | string | number;
+type Tid = '_unclassified' | string;
 
 interface TypeNode {
   cashType: CashType,
-  master: number,
-  quickSelect: number,
-  showInMap: number,
+  master: number | boolean,
+  quickSelect: number | boolean,
+  showInMap: number | boolean,
   tid: Tid
   type_label: string,
   childs?: TypeNode[]
@@ -29,5 +29,8 @@ interface TypeMapFlat {
   }
 }
 
-type TypeMapCallback = (tid: Tid, typeLabel: string) => void;
+type TypeMapCallback = (tid?: Tid, typeLabel?: string) => void;
 
+interface TypeRelationMap {
+  [tid: string]: Tid[]
+}

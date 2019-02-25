@@ -56,6 +56,7 @@ export class TypeMapFragmentDirectiveComponent implements OnInit {
           });
       }
     } else {
+      // TODO: Bug when the uclassified type relate each other will disapear
       const unclassifiedNodes = {};
       const listOfChild = [];
 

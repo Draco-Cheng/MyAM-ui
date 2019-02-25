@@ -4,7 +4,39 @@ import { RequestHandler } from '../handler/request.handler';
 import { CacheHandler } from '../handler/cache.handler';
 import { NotificationHandler } from '../handler/notification.handler';
 
-const tidRelatedCache = {
+interface TypeMapStructure {
+  sequence: number;
+  sub_tid: Tid;
+  tid: Tid;
+}
+
+interface SetTypeFormData {
+  tid?: Tid;
+  type_label: string;
+  cashType: CashType;
+  master: boolean | number;
+  quickSelect: number | boolean;
+  showInMap: number | boolean;
+}
+
+type SetTypeResponse = { tid: Tid }[];
+
+export interface ChildsList {
+  childs?: Tid[];
+  unclassified?: Tid[];
+}
+
+interface TidRelatedCache {
+  'nodeAllParentsInTree': TypeRelationMap;
+  'nodeAllChildsInTree': TypeRelationMap;
+  'tidToLabelMap': { [tid: string]: string };
+  'rootChildsInNextLayer': {
+    'enableShowInMap': ChildsList;
+    'disableShowInMap': ChildsList;
+  };
+}
+
+const tidRelatedCache: TidRelatedCache = {
   'nodeAllParentsInTree': {},
   'nodeAllChildsInTree': {},
   'tidToLabelMap': null,
@@ -26,7 +58,7 @@ const tidRelatedCache = {
     this.get();
   }
 
-  wipe(id?: String) {
+  wipe(id?: string): void {
     if (id) {
       this.cacheHandler.wipe(id);
     } else {
@@ -40,7 +72,7 @@ const tidRelatedCache = {
     tidRelatedCache['rootChildsInNextLayer'] = null;
   }
 
-  async get(formObj?: any): Promise<CacheEle<TypeNode[]>> {
+  async get(): Promise<CacheEle<TypeNode[]>> {
     const cacheName = 'type';
     const cache = await this.cacheHandler.get(cacheName, true);
 
@@ -49,7 +81,7 @@ const tidRelatedCache = {
     } else {
       const resolveCache = this.cacheHandler.regAsyncReq(cacheName);
       const url = this.endpoint + '/get';
-      const resault = await this.request.post(url);
+      const resault = await this.request.post<TypeNode[]>(url);
 
       if (resault['success']) {
         this.buildTidToLabelMap(resault['data']);
@@ -60,7 +92,8 @@ const tidRelatedCache = {
     }
   }
 
-  async getTypeFlat() {
+  async getTypeFlat(): Promise<TypeFlat> {
+    // TODO: Check it is unneccessary and remove it
     const cacheName = 'type.flat';
     const cache = await this.cacheHandler.get(cacheName, true);
 
@@ -80,7 +113,7 @@ const tidRelatedCache = {
     }
   }
 
-  buildTidToLabelMap(typeData) {
+  buildTidToLabelMap(typeData: TypeNode[]): void {
     tidRelatedCache['tidToLabelMap'] = tidRelatedCache['tidToLabelMap'] || {};
     typeData.forEach(type => tidRelatedCache['tidToLabelMap'][type.tid] = type.type_label);
   }
@@ -96,7 +129,7 @@ const tidRelatedCache = {
 
       const reObj = {};
       const url = this.endpoint + '/getMaps';
-      const resault = <any[]>await this.request.post(url);
+      const resault = await this.request.post<TypeMapStructure[]>(url);
 
       if (resault['success']) {
         resault['data'].forEach(ele => {
@@ -114,7 +147,7 @@ const tidRelatedCache = {
     }
   }
 
-  async set(formObj?: any) {
+  async set(formObj?: SetTypeFormData): Promise<void> {
     const url = this.endpoint + '/set';
     const data = {
       tid: formObj.tid,
@@ -124,7 +157,7 @@ const tidRelatedCache = {
       quickSelect: formObj.quickSelect ? 1 : 0,
       showInMap: formObj.showInMap ? 1 : 0
     };
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SetTypeResponse>(url, data);
 
     if (resault['success']) {
       this.wipe();
@@ -134,7 +167,7 @@ const tidRelatedCache = {
     }
   }
 
-  async add(formObj?: any) {
+  async add(formObj?: SetTypeFormData & { parents: TypeFlatMap }): Promise<ReturnObject<SetTypeResponse>> {
     const urlSet = this.endpoint + '/set';
     const urlSetMap = this.endpoint + '/setMaps';
     const parentsArr = Object.keys(formObj.parents);
@@ -147,7 +180,7 @@ const tidRelatedCache = {
       quickSelect: formObj.quickSelect ? 1 : 0,
       showInMap: formObj.showInMap ? 1 : 0
     };
-    const resault = await this.request.post(urlSet, dataSet);
+    const resault = await this.request.post<SetTypeResponse>(urlSet, dataSet);
     const tid = resault['data'][0]['tid'];
 
     if (!resault['success']) {
@@ -175,12 +208,12 @@ const tidRelatedCache = {
     return resault;
   }
 
-  async del(del_tid) {
+  async del(del_tid: Tid): Promise<ReturnObject<null>> {
     const url = this.endpoint + '/del';
     const data = {
       del_tid: del_tid
     };
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<null>(url, data);
 
     if (resault['success']) {
       this.wipe();
@@ -193,13 +226,13 @@ const tidRelatedCache = {
   }
 
 
-  async unlinkParant(p_tid, c_tid) {
+  async unlinkParant(p_tid: Tid, c_tid: Tid): Promise<ReturnObject<null>> {
     const url = this.endpoint + '/delMaps';
     const data = {
       del_tid: p_tid,
       del_sub_tid: c_tid
     };
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<null>(url, data);
 
 
     if (resault['success']) {
@@ -211,13 +244,13 @@ const tidRelatedCache = {
     return resault;
   }
 
-  async linkParant(p_tid, c_tid) {
+  async linkParant(p_tid: Tid, c_tid: Tid): Promise<ReturnObject<null>> {
     const url = this.endpoint + '/setMaps';
     const data = {
       tid: p_tid,
       sub_tid: c_tid
     };
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<null>(url, data);
 
     if (resault['success']) {
       this.wipe('type.flatmap');
@@ -228,7 +261,7 @@ const tidRelatedCache = {
     return resault;
   }
 
-  async getAllParentsInTree(tid) {
+  async getAllParentsInTree(tid: Tid): Promise<Tid[]> {
     if (!tidRelatedCache['nodeAllParentsInTree'][tid]) {
       const map = (await this.getFlatMap())['data'];
       const arr = [];
@@ -237,7 +270,7 @@ const tidRelatedCache = {
     }
     return tidRelatedCache['nodeAllParentsInTree'][tid];
   }
-  getAllParentsInTreeRecursive(map, arr, tid) {
+  getAllParentsInTreeRecursive(map: TypeMapFlat, arr: Tid[], tid: Tid): void {
     if (!map[tid] || !map[tid]['parents'] || arr.indexOf(tid) !== -1) {
       return;
     }
@@ -251,7 +284,7 @@ const tidRelatedCache = {
     });
   }
 
-  async getAllChildsInTree(tid) {
+  async getAllChildsInTree(tid: Tid): Promise<Tid[]> {
     if (!tidRelatedCache['nodeAllChildsInTree'][tid]) {
       const map = (await this.getFlatMap())['data'];
       const arr = [];
@@ -260,7 +293,7 @@ const tidRelatedCache = {
     }
     return tidRelatedCache['nodeAllChildsInTree'][tid];
   }
-  getAllChildsInTreeRecursive(map, arr, tid) {
+  getAllChildsInTreeRecursive(map: TypeMapFlat, arr: Tid[], tid: Tid): void {
     if (!map[tid] || !map[tid]['childs'] || arr.indexOf(tid) !== -1) {
       return;
     }
@@ -274,7 +307,7 @@ const tidRelatedCache = {
     });
   }
 
-  async getChildsInNextLayer(tid?: number, disableShowInMap?: boolean) {
+  async getChildsInNextLayer(tid?: Tid, disableShowInMap?: boolean): Promise<ChildsList> {
     if (!tid) {
       const cacheType = disableShowInMap ? 'disableShowInMap' : 'enableShowInMap';
       if (tidRelatedCache['rootChildsInNextLayer'][cacheType]) {
@@ -283,7 +316,7 @@ const tidRelatedCache = {
         const flatMap = (await this.getFlatMap())['data'];
         const types = (await this.get())['data'];
 
-        const returnObj = {
+        const returnObj: ChildsList = {
           childs: [],
           unclassified: []
         };
@@ -309,7 +342,7 @@ const tidRelatedCache = {
       const types = (await this.get())['data'];
 
       if (!flatMap[tid]) {
-        return [];
+        return {};
       }
 
       if (disableShowInMap) {
@@ -320,7 +353,7 @@ const tidRelatedCache = {
     }
   }
 
-  tidToLable(tid) {
+  tidToLable(tid: Tid): string {
     return tidRelatedCache['tidToLabelMap'][tid];
   }
 }

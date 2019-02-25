@@ -8,10 +8,28 @@ import { NotificationHandler } from '../handler/notification.handler';
 
 import profileMap from './profile.map.json';
 
+export interface SetProfileFormData {
+  name: string;
+  mail: string;
+  breakpoint: string; // The number of day to auto generate the snapshot
+  pwd?: string; // original password
+  pwd2?: string; // new password
+}
+
+interface ProfileMapStructure {
+  status: {
+    [statusCode in Status]: string
+  };
+
+  permission: {
+    [permissionCode in Permission]: string
+  };
+}
+
 @Injectable() export class ProfileService {
   private endpoint_db = '/db';
   private endpoint_profile = '/profile';
-  private encrypt;
+  private encrypt: (str: string) => string;
 
   constructor(
     private config: ConfigHandler,
@@ -23,17 +41,18 @@ import profileMap from './profile.map.json';
     this.encrypt = cryptHandler.encrypt;
   }
 
-  getConfig() {
+  getConfig(): Config {
     return this.config.get();
   }
 
-  async updateConfigProfile() {
+  async updateConfigProfile(): Promise<void> {
     const urlProfile = this.endpoint_profile + '/get';
     const resaultProfile = await this.request.post(urlProfile);
     let userProfile;
 
     if (!resaultProfile['success']) {
-      return this.notificationHandler.broadcast('error', resaultProfile['message']);
+      this.notificationHandler.broadcast('error', resaultProfile['message']);
+      return;
     }
 
     userProfile = resaultProfile['data']['user'][0];
@@ -43,7 +62,8 @@ import profileMap from './profile.map.json';
       const resaultDbList = await this.request.post(urlDbList);
 
       if (!resaultDbList['success']) {
-        return this.notificationHandler.broadcast('error', resaultDbList['message']);
+        this.notificationHandler.broadcast('error', resaultDbList['message']);
+        return;
       }
 
       userProfile['dbList'] = resaultDbList['data']['dbList'];
@@ -52,13 +72,13 @@ import profileMap from './profile.map.json';
     this.config.setUserProfile(userProfile);
   }
 
-  async getBreakpointDbList(database) {
+  async getBreakpointDbList(database: string): Promise<ReturnObject<string[]>> {
     const url = this.endpoint_db + '/breakpoint/list';
     const data = {
       db: database
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<string[]>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);
@@ -67,14 +87,14 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  async delBreakpointDb(database, breakpoint) {
+  async delBreakpointDb(database: string, breakpoint: string): Promise<ReturnObject<null>> {
     const url = this.endpoint_db + '/breakpoint/del';
     const data = {
       db: database,
       breakpoint: breakpoint
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<null>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);
@@ -85,14 +105,14 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  async createDB(dbName, mainCurrenciesType) {
+  async createDB(dbName: string, mainCurrenciesType: CurrencyType): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint_db + '/create';
     const data = {
       db: dbName,
       mainCurrenciesType: mainCurrenciesType
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SimpleMessageResponse>(url, data);
 
     if (!resault['success']) {
       this.notificationHandler.broadcast('error', resault['message']);
@@ -106,7 +126,7 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  async uploadDB(dbName, file) {
+  async uploadDB(dbName: string, file: File): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint_db + '/upload';
     const data = {
       name: dbName,
@@ -125,13 +145,13 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  async delDB(dbName) {
+  async delDB(dbName: string): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint_db + '/del';
     const data = {
       db: dbName
     };
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SimpleMessageResponse>(url, data);
 
     await this.updateConfigProfile();
 
@@ -149,14 +169,14 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  wipeCache() {
+  wipeCache(): void {
     this.cacheHandler.wipe('currency');
     this.cacheHandler.wipe('currency.map');
     this.cacheHandler.wipe('type');
     this.cacheHandler.wipe('type.flatmap');
   }
 
-  setActiveDb(dbName) {
+  setActiveDb(dbName: string): void {
     localStorage.setItem(this.config.get('uid') + '.db', dbName);
 
     this.config.set('database', dbName);
@@ -164,7 +184,7 @@ import profileMap from './profile.map.json';
     this.wipeCache();
   }
 
-  async downloadDb(dbName, breakpoint?) {
+  async downloadDb(dbName: string, breakpoint?: string): Promise<ReturnObject<Blob>> {
     const url = this.endpoint_db + '/download';
 
     const data = {};
@@ -179,14 +199,14 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  async renameDb(dbName, newDbName) {
+  async renameDb(dbName: string, newDbName: string): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint_db + '/rename';
 
     const data = {};
     data['db'] = dbName;
     data['newDbName'] = newDbName;
 
-    const resault = await this.request.post(url, data);
+    const resault = await this.request.post<SimpleMessageResponse>(url, data);
 
     await this.updateConfigProfile();
 
@@ -204,7 +224,7 @@ import profileMap from './profile.map.json';
     return resault;
   }
 
-  async set(formObj) {
+  async set(formObj: SetProfileFormData): Promise<ReturnObject<SimpleMessageResponse>> {
     const url = this.endpoint_profile + '/set';
     const currentProfile = this.config.get('user');
 
@@ -222,7 +242,7 @@ import profileMap from './profile.map.json';
     }
 
     if (Object.keys(data).length) {
-      const resault = await this.request.post(url, data);
+      const resault = await this.request.post<SimpleMessageResponse>(url, data);
 
       if (!resault['success']) {
         this.notificationHandler.broadcast('error', resault['message']);
@@ -234,13 +254,13 @@ import profileMap from './profile.map.json';
       } else {
         this.notificationHandler.broadcast('success', 'Updated success!');
         await this.updateConfigProfile();
-        return { data: resault };
+        return resault;
       }
 
     }
   }
 
-  getProfileMap() {
+  getProfileMap(): ProfileMapStructure {
     return profileMap;
   }
 }

@@ -3,7 +3,7 @@ type Status = 0 | 20; // [0]Waiting Verify [20]Normal
 type Uid = number;
 
 interface UserData {
-  breakpoint: string[];
+  breakpoint: string;
   date: TimeStamp;
   mail: string;
   name: string;

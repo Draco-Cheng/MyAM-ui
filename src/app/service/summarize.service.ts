@@ -15,7 +15,7 @@ import { CurrencyService } from './currency.service';
     private currencyService: CurrencyService
   ) { }
 
-  async buildDaySummerize(records) {
+  async buildDaySummerize(records: RecordNode[]): Promise<DailySummerize[]> {
     const currencyService = this.currencyService;
     const defaultCid = currencyService.getDefaultCid();
     const summerizeTemp = {};
@@ -36,7 +36,7 @@ import { CurrencyService } from './currency.service';
     return daySummerize;
   }
 
-  async buildTypeSummerize(records): Promise<SummerizeByType> {
+  async buildTypeSummerize(records: RecordNode[]): Promise<SummerizeByType> {
     const typeService = this.typeService;
     const currencyService = this.currencyService;
     const defaultCid = currencyService.getDefaultCid();
@@ -49,7 +49,7 @@ import { CurrencyService } from './currency.service';
 
     for (const record of records) {
       const parentTids = {};
-      for (const tid of record.tids) {
+      for (const tid of <Tid[]>record.tids) {
         const allRelateNode = await typeService.getAllParentsInTree(tid);
         for (const ptid of allRelateNode) {
           parentTids[ptid] = true;
@@ -129,8 +129,12 @@ import { CurrencyService } from './currency.service';
     return <SummerizeByType>typeSummerize;
   }
 
+  async typeSummerizeToPieChart(
+    typeSummerize: SummerizeByType,
+    typelist: Tid[],
+    unclassifiedTypeList: Tid[],
+    showTypeNone?: boolean): Promise<NgxChartNode[]> {
 
-  async typeSummerizeToPieChart(typeSummerize, typelist, unclassifiedTypeList, showTypeNone?) {
     const ngxChartData = [];
 
     for (let i = 0; i < typelist.length; i++) {
