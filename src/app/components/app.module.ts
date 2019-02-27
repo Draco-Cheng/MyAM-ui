@@ -34,6 +34,8 @@ import { ProfileModule } from './profile/profile.module';
 import { AboutModule } from './about/about.module';
 import { AdminModule } from './admin/admin.module';
 import { NotificationBubbleModule } from './notification-bubble/notification-bubble.module';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../..//environments/environment';
 
 @NgModule({
   imports: [
@@ -61,7 +63,8 @@ import { NotificationBubbleModule } from './notification-bubble/notification-bub
     RecordsModule,
     ProfileModule,
     NotificationBubbleModule,
-    AdminModule
+    AdminModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   declarations: [
     AppComponent

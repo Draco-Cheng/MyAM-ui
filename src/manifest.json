@@ -1,0 +1,21 @@
+{
+  "name": "myam-ui",
+  "short_name": "myam-ui",
+  "theme_color": "#1976d2",
+  "background_color": "#fafafa",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "img/logo.png",
+      "sizes": "99x105",
+      "type": "image/png"
+    },
+    {
+      "src": "img/logo_white.png",
+      "sizes": "99x105",
+      "type": "image/png"
+    }
+  ]
+}
