@@ -1,0 +1,71 @@
+{
+  "configVersion": 1,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "urls": [
+        "/favicon.ico",
+        "/index.html",
+        "/main.5273b28cf2445240ee37.js",
+        "/polyfills.4987ce39fa522529e62b.js",
+        "/runtime.a5dd35324ddfd942bef1.js",
+        "/styles.d0a3c911af7be401f56b.css",
+        "/vendor.5e1ac7d1c65bb7b8155a.js"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "urls": [
+        "/glyphicons-halflings-regular.448c34a56d699c29117a.woff2",
+        "/glyphicons-halflings-regular.89889688147bd7575d63.svg",
+        "/glyphicons-halflings-regular.e18bbf611f2a2e43afc0.ttf",
+        "/glyphicons-halflings-regular.f4769f9bdb7466be6508.eot",
+        "/glyphicons-halflings-regular.fa2772327f55d8198301.woff",
+        "/logo.a61106a5ea4b58d42c2f.png",
+        "/logo_white.1e883a6925720a3b17a8.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/favicon.ico": "ffe2dde7e32c3551496b9e9371ff1267726bfd8a",
+    "/glyphicons-halflings-regular.448c34a56d699c29117a.woff2": "ca35b697d99cae4d1b60f2d60fcd37771987eb07",
+    "/glyphicons-halflings-regular.89889688147bd7575d63.svg": "de51a8494180a6db074af2dee2383f0a363c5b08",
+    "/glyphicons-halflings-regular.e18bbf611f2a2e43afc0.ttf": "44bc1850f570972267b169ae18f1cb06b611ffa2",
+    "/glyphicons-halflings-regular.f4769f9bdb7466be6508.eot": "86b6f62b7853e67d3e635f6512a5a5efc58ea3c3",
+    "/glyphicons-halflings-regular.fa2772327f55d8198301.woff": "278e49a86e634da6f2a02f3b47dd9d2a8f26210f",
+    "/index.html": "fbc7a78c31ecc5c94b241a99da0ccd8faa4b6a11",
+    "/logo.a61106a5ea4b58d42c2f.png": "e1b8f402ae3bf73e0c54647229d2ee3bdb34d664",
+    "/logo_white.1e883a6925720a3b17a8.png": "5af27ec3bc95bdc10928b2f7ed4c14812191ea46",
+    "/main.5273b28cf2445240ee37.js": "ad707e54938cd6426e91b5eae9b5d84842237040",
+    "/polyfills.4987ce39fa522529e62b.js": "6946e10a03311677a01490b8e91741668e64e17e",
+    "/runtime.a5dd35324ddfd942bef1.js": "b62956c2192bfe5516d6374e753773901ed50ec5",
+    "/styles.d0a3c911af7be401f56b.css": "ab1888ca58322e7fa77109f61c078a870b749818",
+    "/vendor.5e1ac7d1c65bb7b8155a.js": "f3c309990f8fe432fbfde6f0120fb2a660ca1768"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ]
+}
